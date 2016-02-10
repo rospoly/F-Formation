@@ -40,5 +40,10 @@ namespace fFormations
             Person temp = obj as Person;
             return temp == null ? false : temp == this;
         }
+ 
+        public override int GetHashCode()
+        {
+            return ID;
+        }
     }
 }
