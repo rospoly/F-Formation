@@ -63,7 +63,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ClasseProva.cs" />
     <Compile Include="Frame.cs" />
     <Compile Include="Group.cs" />
     <Compile Include="Person.cs" />
