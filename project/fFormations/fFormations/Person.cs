@@ -15,13 +15,16 @@ namespace fFormations
 
         public int ID { get; private set; }
 
-        public double CoordX { get; private set}
+        public double CoordX { get { return coordX; } set { if (value > 0) coordX = value; } }
+        public double CoordY { get { return coordY; } set { if (value > 0) coordY = value; } }
+
+        public double Angle { get { return angle; } set { if (Math.Abs(value) < Math.PI) angle = value; } }
 
         public Person(int id, double coordX, double coordY, double angle) {
             this.ID = id;
-            this.coordX = coordX;
-            this.coordY = coordY;
-            this.angle = angle;
+            this.CoordX = coordX;
+            this.CoordY = coordY;
+            this.Angle = angle;
         }
 
         public static bool operator ==(Person a, Person b)
