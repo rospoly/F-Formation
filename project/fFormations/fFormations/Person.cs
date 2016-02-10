@@ -29,6 +29,9 @@ namespace fFormations
             this.Angle = angle;
         }
 
+
+
+
         public static bool operator ==(Person a, Person b)
         {
             return a.ID == b.ID;
