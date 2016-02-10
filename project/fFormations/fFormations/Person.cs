@@ -13,8 +13,6 @@ namespace fFormations
         private double coordY;
         private double angle;
 
-
-
         public int ID { get; private set; }
 
         public double CoordX { get { return coordX; } set { if (value > 0) coordX = value; } }
@@ -28,9 +26,6 @@ namespace fFormations
             this.CoordY = coordY;
             this.Angle = angle;
         }
-
-
-
 
         public static bool operator ==(Person a, Person b)
         {
