@@ -1,14 +1,1 @@
 C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\bin\Debug\fFormations.exe.config
-C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\bin\Debug\fFormations.exe
-C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\bin\Debug\fFormations.pdb
-C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\fFormations.csprojResolveAssemblyReference.cache
-C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\MainWindow.g.cs
-C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\App.g.cs
-C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\fFormations_MarkupCompile.cache
-C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\fFormations_MarkupCompile.lref
-C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\MainWindow.baml
-C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\fFormations.g.resources
-C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\fFormations.Properties.Resources.resources
-C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\fFormations.csproj.GenerateResource.Cache
-C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\fFormations.exe
-C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\fFormations.pdb
