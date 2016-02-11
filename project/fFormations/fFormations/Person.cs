@@ -6,6 +6,18 @@ using System.Threading.Tasks;
 
 namespace fFormations
 {
+    public class PersonComparator : IEqualityComparer<Person>
+    {
+        public bool Equals(Person a, Person b)
+        {
+            return a==b;
+        }
+
+        public int GetHashCode(Person a)
+        {
+            return a.GetHashCode();
+        }
+    }
     public class Person
     {
         //private int ID;
