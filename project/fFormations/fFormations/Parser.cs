@@ -52,10 +52,10 @@ namespace fFormations
 
             List<Frame> frames = new List<Frame>();
 
-            String framePattern = @"(\d+)\s+(\d+)"; //frame id and number of elements
+            String framePattern = @"(\d+)\s+(\d+)"; //frame header: id and number of elements
            // String groupPattern = @"(\d+)\s+([-+*/])\s+(\d+)";
-            String personPattern = @"(\d+)\s+(\d+)\s+(\d+)\s+(\d+)";
-
+            String personPattern = @"(\d+)\s+(\-?\d*\.?\d+)\s+(\-?\d*\.?\d+)\s+(\-?\d*\.?\d+)";
+          
             //read lines from data file
             string[] dataLines = null;
             try
