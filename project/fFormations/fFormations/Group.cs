@@ -30,24 +30,41 @@ namespace fFormations
             int temp = Grouping.Keys.Count;
             Grouping.Add(temp, b);
         }
-
-        public int Compare(Group a, double error=0) {
-            if (IdFrame != a.IdFrame) return -1;//Non sto confrontando gli stessi frame
-            foreach (List<Person> l1 in Grouping.Values) {
-                foreach (List<Person> l2 in a.Grouping.Values)
+        //ATTENZIONE 
+        /// <summary>
+        /// Ordine importante! Il primo parametro è il gruppo stimato,
+        /// il secondo parametro il gruppo originale!
+        /// OutPut una lista con: prima posizione CORRETTI, seconda posizione FALSI POSITIVI, terza posizione FALSI NEGATIVI
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="orig"></param>
+        /// <param name="error"></param>
+        /// <returns></returns>
+        public static List<int> Compare(Group val, Group orig,double error=1) {
+            if (val.IdFrame != orig.IdFrame) return new List<int>();//Non sto confrontando gli stessi frame
+            int correct = 0;
+            int falsePositive = 0;
+            int falseNegative = 0;
+            foreach (List<Person> l1 in val.Grouping.Values) {
+                foreach (List<Person> l2 in orig.Grouping.Values)
                 {
                     IEnumerable<Person> temp = l1.Intersect<Person>(l2,new PersonComparator());
-                    if (l1.Count == 2 && l2.Count == 2)
-                    {
-                       //( if (temp.Count<Person>()==)
-                    }
+                    if (l1.Count == 2 && l2.Count == 2 && temp.Count<Person>()==2)
+                        correct++;
                     else
-                    {
-
-        }
-        }
+                        if ((temp.Count<Person>() / Math.Max(l1.Count, l2.Count)) >= error)
+                            correct++;
+                }
             }
-            return 0;
+            falsePositive = val.Grouping.Values.Count - correct;
+            //groups that are present in MY evaluation but not in TRUE one
+            falseNegative = orig.Grouping.Values.Count - correct;
+            //groups that are present in the TRUE evaluation but not in MY
+            List<int> myList = new List<int>();
+            myList.Add(falseNegative);
+            myList.Add(falsePositive);
+            myList.Add(correct);
+            return myList;
         }
     }
 }
