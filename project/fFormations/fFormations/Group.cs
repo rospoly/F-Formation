@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace fFormations
 {
-    class Group 
+    public class Group
     {
         public Frame IdFrame { get; private set;}
         public int GN { get; private set; }//grouping number -> numero sottogruppi
@@ -44,8 +44,8 @@ namespace fFormations
                     else
                     {
 
-                    }
-                }
+        }
+        }
             }
             return 0;
         }
