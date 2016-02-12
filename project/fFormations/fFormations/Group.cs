@@ -9,9 +9,9 @@ namespace fFormations
 {
     public class Group
     {
-        public Frame IdFrame { get; private set;}//Id del frame cui è associato un gruppo
-        public int GN { get; private set; }//grouping number -> numero sottogruppi
-        public Dictionary<int, List<Person>> Grouping { get; private set; }
+        public Frame IdFrame { get; private set;}//Frame Id associated to a group
+        public int GN { get; private set; }//number of subgroups
+        public Dictionary<int, List<Person>> Grouping { get; private set; }//
 
         public Group(Frame IdFrame,int GN,Dictionary<int,List<Person>> grouping) {
             this.IdFrame = IdFrame;
