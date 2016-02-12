@@ -38,6 +38,13 @@ namespace fFormations
             persons.Remove(p);
             N = persons.Count;
         }
+
+        //returns null if the id does not exists in the frame
+        public Person getPersonById(int id)
+        {
+            return persons.Find(x => x.ID == id);
+        }
+
         public static bool operator ==(Frame a, Frame b)
         {
             return a.IdFrame== b.IdFrame;
