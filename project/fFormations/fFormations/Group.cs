@@ -9,7 +9,7 @@ namespace fFormations
 {
     public class Group
     {
-        public Frame IdFrame { get; private set;}
+        public Frame IdFrame { get; private set;}//Id del frame cui è associato un gruppo
         public int GN { get; private set; }//grouping number -> numero sottogruppi
         public Dictionary<int, List<Person>> Grouping { get; private set; }
 
