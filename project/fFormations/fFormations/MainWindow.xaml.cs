@@ -20,9 +20,21 @@ namespace fFormations
     /// </summary>
     public partial class MainWindow : Window
     {
+        public string dataFile = @"input/features.txt";
+        public string gtFile = @"input/gt.txt";
+
         public MainWindow()
         {
             InitializeComponent();
+
+            /* PARSER TEST */
+
+            //get singleton and set paths
+            Parser P = Parser.getParser();
+            P.setFiles(dataFile, gtFile);
+            List<Frame> list = P.readData();
+
+            Console.ReadLine();
         }
     }
 }
