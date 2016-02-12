@@ -29,7 +29,6 @@ namespace fFormations
         public void addSubGroup(List<Person> b) {
             int temp = Grouping.Keys.Count;
             Grouping.Add(temp, b);
-            GN++;
         }
         //ATTENZIONE 
         /// <summary>
@@ -57,9 +56,9 @@ namespace fFormations
                             correct++;
                 }
             }
-            falsePositive = val.GN- correct;
+            falsePositive = val.Grouping.Values.Count - correct;
             //groups that are present in MY evaluation but not in TRUE one
-            falseNegative = orig.GN - correct;
+            falseNegative = orig.Grouping.Values.Count - correct;
             //groups that are present in the TRUE evaluation but not in MY
             List<int> myList = new List<int>();
             myList.Add(falseNegative);
