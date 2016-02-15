@@ -29,6 +29,7 @@ namespace fFormations
         public void addSubGroup(List<Person> b) {
             int temp = Grouping.Keys.Count;
             Grouping.Add(temp, b);
+            GN++;
         }
         //ATTENZIONE 
         /// <summary>
