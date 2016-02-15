@@ -25,3 +25,4 @@ C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Deb
 C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\fFormations.csproj.GenerateResource.Cache
 C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\fFormations.exe
 C:\Users\Mara\Desktop\AI\Git Fformations\project\fFormations\fFormations\obj\Debug\fFormations.pdb
+C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\fFormations.csprojResolveAssemblyReference.cache
