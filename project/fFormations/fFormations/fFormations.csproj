@@ -66,6 +66,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataManager.cs" />
     <Compile Include="FactoryFrame.cs" />
     <Compile Include="FactoryGroup.cs" />
     <Compile Include="FactoryPerson.cs" />

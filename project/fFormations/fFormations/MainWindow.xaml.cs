@@ -33,9 +33,14 @@ namespace fFormations
             Parser P = Parser.getParser();
             P.setDataFile(dataFile);
             P.setGTFile(gtFile);
-            List<Frame> list = P.readData();
+            List<Frame> frames = P.readData();
+            List<Group> groups = P.readGT(frames);
 
-            
+            /* DATA MANAGER */
+
+            DataManager dm = new DataManager();
+            dm.loadFrames(dataFile);
+            dm.loadGT(gtFile);
 
             Console.ReadLine();
         }
