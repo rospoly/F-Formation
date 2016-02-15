@@ -32,20 +32,22 @@ namespace fFormations
         }
 
         //sets the input files, throw exception if one does not exists
-        public void setFiles(string dataFile, string gtFile)
+        public void setDataFile(string dataFile)
         {
             //check data file path
             if (!File.Exists(dataFile))
                 throw new FileNotFoundException("Data file does not exixts");
             else
-                DataFile = dataFile;
+                DataFile = dataFile; 
+        }
 
+        public void setGTFile(string gtFile)
+        {
             //check GT file path
             if (!File.Exists(gtFile))
                 throw new FileNotFoundException("GT file does not exixts");
             else
                 GtFile = gtFile;
-
         }
 
         public List<Frame> readData()
@@ -122,7 +124,7 @@ namespace fFormations
             return frames;
         }
 
-        public List<Group> readGT()
+        public List<Group> readGT(List<Frame> frames)
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
@@ -150,17 +152,26 @@ namespace fFormations
                 {
                     int id = Int32.Parse(m.Groups[1].Value); //frame id
                     int n = Int32.Parse(m.Groups[2].Value); //frame groups
-                    //Group newGroup = new Group();
-                    for (int j = 1; j <= n; j++)
+
+                    // trova il frame con ID == id
+                    Frame currentFrame = frames.Find(x => x.IdFrame == id);
+                    Group newGroup = FactoryGroup.createGroup(currentFrame);
+
+                    for (int j = 1; j <= n; j++) //for each subgroup
                     {
+                        List < Person > peopleGroup = new List<Person>();
                         string[] elements = gtLines[i + j].Split(new Char[] { ' ' }); //space is the separator
+                        foreach(string s in elements)
+                        {
+                            int personId = Int32.Parse(s);
+                            Person p = currentFrame.getPersonById(personId);
+                            peopleGroup.Add(p);
+                        }
 
-                        
+                        newGroup.addSubGroup(peopleGroup);
                     }
-
-                    //create the group
-                    
-
+                    //add the new grouping
+                    groups.Add(newGroup);
                     //update i
                     i = i + n;
                 }
