@@ -38,9 +38,8 @@ namespace fFormations
 
             /* DATA MANAGER */
 
-            DataManager dm = new DataManager();
-            dm.loadFrames(dataFile);
-            dm.loadGT(gtFile);
+            DataManager dm = new DataManager(dataFile, gtFile);
+
 
             Console.ReadLine();
         }

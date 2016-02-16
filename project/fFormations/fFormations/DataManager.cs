@@ -13,34 +13,44 @@ namespace fFormations
         private static int idCounter = 0;
 
         private int id {get;}
-        private List<Frame> frames = null;
-        private List<Group> groups = null;
+        private readonly List<Frame> frames;
+        private readonly List<Group> groups;
 
         private Dictionary<int, Tuple<Frame, Group>> data { get; }
 
-        public DataManager()
+        public DataManager(string framesPath, string GTPath)
         {
             id = idCounter;
             idCounter++;
-        }
 
-        public void loadFrames(string framesPath)
-        {
+            //load files and build the dictionary
+            //loadFrames(framesPath);
+            //loadGT(GTPath);
             P.setDataFile(framesPath);
             frames = P.readData();
+            P.setGTFile(GTPath);
+            groups = P.readGT(frames);
+
+            setDictionary();
         }
 
-        public void loadGT(string GTPath)
-        {
-            if (frames != null)
-            {
-                P.setGTFile(GTPath);
-                groups = P.readGT(frames);
+        //private void loadFrames(string framesPath)
+        //{
+        //    P.setDataFile(framesPath);
+        //    frames = P.readData();
+        //}
 
-                setDictionary();
-            }
+        //private void loadGT(string GTPath)
+        //{
+        //    if (frames != null)
+        //    {
+        //        P.setGTFile(GTPath);
+        //        groups = P.readGT(frames);
 
-        }
+        //        setDictionary();
+        //    }
+
+        //}
 
         //if frame id exists, returns the frame, otherwise null
         public Frame getFrameById(int id)
