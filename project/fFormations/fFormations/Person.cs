@@ -20,11 +20,10 @@ namespace fFormations
     }
     public class Person
     {
-        //private int ID;
         private double coordX;
         private double coordY;
         private double angle;
-
+        private int helpLabel;
         public int ID { get; private set; }
 
         public double CoordX { get { return coordX; } set { if (value > 0) coordX = value; } }
@@ -37,12 +36,14 @@ namespace fFormations
             this.CoordX = coordX;
             this.CoordY = coordY;
             this.Angle = angle;
+            helpLabel = -1;
         }
 
         public static bool operator ==(Person a, Person b)
         {
             return a.ID == b.ID;
         }
+
         public static bool operator !=(Person a, Person b)
         {
             return a.ID != b.ID;
@@ -56,6 +57,10 @@ namespace fFormations
         public override int GetHashCode()
         {
             return ID;
+        }
+
+        public double getDistance(Person p) {
+            return Math.Sqrt(Math.Pow(CoordX - p.CoordX,2)+Math.Pow(CoordY - p.CoordY,2));
         }
     }
 }
