@@ -18,6 +18,7 @@ namespace fFormations
             return a.GetHashCode();
         }
     }
+
     public class Person
     {
         private double coordX;
@@ -28,15 +29,15 @@ namespace fFormations
 
         public double CoordX { get { return coordX; } set { if (value > 0) coordX = value; } }
         public double CoordY { get { return coordY; } set { if (value > 0) coordY = value; } }
-
+        public int HelpLabel { get; private set;}
         public double Angle { get { return angle; } set { if (Math.Abs(value) < Math.PI) angle = value; } }
 
-        public Person(int id, double coordX, double coordY, double angle) {
+        public Person(int id, double coordX, double coordY, double angle,int label) {
             this.ID = id;
             this.CoordX = coordX;
             this.CoordY = coordY;
             this.Angle = angle;
-            helpLabel = -1;
+            helpLabel = label;
         }
 
         public static bool operator ==(Person a, Person b)
@@ -61,6 +62,11 @@ namespace fFormations
 
         public double getDistance(Person p) {
             return Math.Sqrt(Math.Pow(CoordX - p.CoordX,2)+Math.Pow(CoordY - p.CoordY,2));
+        }
+
+        public int getLabel()
+        {
+            return HelpLabel;
         }
     }
 }

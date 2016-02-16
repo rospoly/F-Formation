@@ -10,25 +10,18 @@ namespace fFormations
 {
     public class Frame
     {
-        private int n;
-        //private Dictionary<int, int> labels;
+
         public List<Person> Persons { get; private set; }
-        private Matrix<double> distances;
+        public Matrix<double> distances { get; private set; }
         public int IdFrame { get; private set; }
         public int N { get; private set; }
 
-        public Frame(int idFrame, int n, List<Person> persons) {
-            this.N = n;
+        public Frame(int idFrame, List<Person> persons) {
+            this.N = persons.Count;
             this.IdFrame = idFrame;
             this.Persons = persons;
-            /*int i = 0;
-            foreach (Person elem in Persons) {
-                labels.Add(elem.ID, i);
-                i++;
-            }
             distances = Matrix<double>.Build.Dense(N, N);
-            */
-            //computeDistances();
+            computeDistances();
         }
 
         public Frame(int idFrame)
@@ -36,41 +29,34 @@ namespace fFormations
             this.N = 0;
             this.IdFrame = idFrame;
             this.Persons = new List<Person>();
-            //labels = new Dictionary<int, int>();
         }
 
-        /*public void AddPerson(Person p) {
-            Persons.Add(p);
-            N = Persons.Count;
-        }
-
-        public void removePerson(Person p)
-        {
-            Persons.Remove(p);
-            N = Persons.Count;
+        public void SetPersons(List<Person> l) {
+            Persons = l;
             computeDistances();
-        }*/
+        }
 
-       /* public void computeDistances() {
+        public void computeDistances() {
             foreach (Person p in Persons){
                 foreach (Person j in Persons){
-
+                    distances[p.HelpLabel, j.HelpLabel] = p.getDistance(j);
                 }
             }
-        }*/
-
-        public double getDistance(Person p, Person j)
-        {
-            if (Persons.Contains(p) & Persons.Contains(j))
-                return (p.getDistance(j));
-            else
-                return -1;
         }
+
+        //public double getDistances(Person p, Person j) {
+            //return ((Persons.Contains(p) && Persons.Contains(j)) ? p.getDistance(j) : -1);
+        //}
 
         //returns null if the id does not exists in the frame
         public Person getPersonById(int id)
         {
             return Persons.Find(x => x.ID == id);
+        }
+
+        public Person getPersonByHelpLabel(int id)
+        {
+            return Persons.Find(x => x.HelpLabel == id);
         }
 
         public static bool operator ==(Frame a, Frame b)
@@ -92,9 +78,5 @@ namespace fFormations
         {
             return IdFrame;
         }
-
-       /* public int getLabel(int a) {
-            return (labels.ContainsKey(a)) ? labels[a] : -1;            
-        }*/
     }
 }

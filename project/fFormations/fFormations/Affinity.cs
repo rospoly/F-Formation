@@ -9,29 +9,22 @@ namespace fFormations
 {
     public abstract class Affinity
     {
-        private Matrix<double> Matrix;
-        public int N { get; private set;}
-        private Frame F;
-        private bool Empty;
+        protected Matrix<double> AdjacencyMatrix { get; set; }
+        protected Frame F { get; private set; }
+
         public Affinity(Frame f)
         {
             this.F = f;
-            N = f.N;
-            Matrix = Matrix<double>.Build.Dense(N, N); 
-            Empty = true;
+            //AdjacencyMatrix = Matrix<double>.Build.Dense(f.N, f.N);
+            computeAffinity();
         }
         public abstract void computeAffinity();
-        public int getDimension()
-        {
-            return N;
+        public int getDimensionAM() {
+            return F.N;
         }
-
         public Matrix<double> getCopyMatrix() {
-            Matrix<double> copy = Matrix.Clone();
+            Matrix<double> copy = AdjacencyMatrix.Clone();
             return copy;
-        }
-        public bool isEmpty() {
-            return Empty;
         }
     }
 }
