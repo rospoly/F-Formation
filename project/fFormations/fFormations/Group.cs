@@ -19,7 +19,7 @@ namespace fFormations
             this.Grouping = grouping;
         }
 
-        public Group(Frame IdFrame)
+        public Group(Frame IdFrame) 
         {
             this.IdFrame = IdFrame;
             this.GN = 0;

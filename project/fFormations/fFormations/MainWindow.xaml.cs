@@ -31,8 +31,16 @@ namespace fFormations
 
             //get singleton and set paths
             Parser P = Parser.getParser();
-            P.setFiles(dataFile, gtFile);
-            List<Frame> list = P.readData();
+            P.setDataFile(dataFile);
+            P.setGTFile(gtFile);
+            List<Frame> frames = P.readData();
+            List<Group> groups = P.readGT(frames);
+
+            /* DATA MANAGER */
+
+            DataManager dm = new DataManager();
+            dm.loadFrames(dataFile);
+            dm.loadGT(gtFile);
 
             Console.ReadLine();
         }
