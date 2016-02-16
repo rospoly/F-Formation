@@ -56,20 +56,7 @@ namespace fFormations
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
 
             List<Frame> frames = new List<Frame>();
-            List<Group> groups = new List<Group>();
-            string[] gtLines = null;
             string[] dataLines = null;
-            
-            //read lines from gt file
-            try
-            {
-                gtLines = File.ReadAllLines(DataFile);
-            }
-            catch (FileNotFoundException e)
-            {
-                Console.Write("Error file gt: ");
-                Console.WriteLine(e.Message);
-            }
             
             //read lines from data file
             try
@@ -84,19 +71,18 @@ namespace fFormations
 
             int i = 0; //counter on data lines
             int j = 0; //counter on gt lines
-            while (i < dataLines?.Length && j<gtLines?.Length)
+            while (i < dataLines?.Length)
             {
                 //first line has to be a frame header in both files
                 Match dataMatch = Regex.Match(dataLines[i], framePattern);
-                Match gtMatch = Regex.Match(gtLines[j], framePattern);
-                int id = checkMatch(dataMatch, gtMatch);//frame id or -1
-                if ( id >= 0)
+                if (dataMatch.Success)
                 {
-                    int n_people = Int32.Parse(dataMatch.Groups[2].Value); //frame people
-                    int n_groups = Int32.Parse(gtMatch.Groups[2].Value); //groups in the frame
-                    Frame newFrame = FactoryFrame.createEmptyFrame(id); //create empty frame
+                    int id = Int32.Parse(dataMatch.Groups[1].Value); //frame id
+                    int n_people = Int32.Parse(dataMatch.Groups[2].Value); //people inside frame
+                    List<Person> people = new List<Person>();
+                   // Frame newFrame = FactoryFrame.createEmptyFrame(id); //create empty frame
 
-                    for (int k = 1; k <= n_people; j++)
+                    for (int k = 1; k <= n_people; k++)
                     {
                         Match p = Regex.Match(dataLines[i + k], personPattern);
                         if (p.Success)
@@ -105,12 +91,12 @@ namespace fFormations
                             double x = Double.Parse(p.Groups[2].Value);
                             double y = Double.Parse(p.Groups[3].Value);
                             double theta = Double.Parse(p.Groups[4].Value);
-                            newFrame.addPerson(FactoryPerson.createPerson(pId, x, y, theta)); //add the person to the list
+                            people.Add(FactoryPerson.createPerson(pId, x, y, theta)); //add the person to the list
                         }
                     }
 
                     //create the frame
-                    frames.Add(newFrame);
+                    frames.Add(FactoryFrame.createFrame(id, people));
 
                     //update i
                     i = i + n_people;
@@ -184,13 +170,5 @@ namespace fFormations
             return groups;
         }
 
-        //returns -1 if not valid, frame id if correct
-        private int checkMatch(Match m1, Match m2)
-        {
-            if (m1.Success && m2.Success && (m1.Groups[1].Value == m2.Groups[1].Value))
-                return Int32.Parse(m1.Groups[1].Value);
-            else
-                return -1;
-        }
     }
 }
