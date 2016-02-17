@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace fFormations
 {
@@ -91,7 +92,7 @@ namespace fFormations
                             double x = Double.Parse(p.Groups[2].Value);
                             double y = Double.Parse(p.Groups[3].Value);
                             double theta = Double.Parse(p.Groups[4].Value);
-                            people.Add(FactoryPerson.createPerson(pId, x, y, theta, k)); //add the person to the list
+                            people.Add(FactoryPerson.createPerson(pId, x, y, theta, k-1)); //add the person to the list
                         }
                     }
 
@@ -106,7 +107,7 @@ namespace fFormations
                     i++;
                 }
             }
-
+            Debug.WriteLine("Frames created: " + frames.Count + " frames");
             return frames;
         }
 
@@ -166,7 +167,7 @@ namespace fFormations
                     i++;
                 }
             }
-
+            Debug.WriteLine("Groups created: " + groups.Count + " grouping");
             return groups;
         }
 
