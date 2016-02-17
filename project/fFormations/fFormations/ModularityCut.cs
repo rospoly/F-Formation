@@ -8,7 +8,7 @@ using MathNet.Numerics.LinearAlgebra.Factorization;
 
 namespace fFormations
 {
-    class ModularityCut : Method
+    public class ModularityCut : Method
     {
         private DataManager dataManager;
         private Affinity affinity; //affinity matrix
@@ -37,7 +37,16 @@ namespace fFormations
 
         public List<Group> ComputeGroup()
         {
+            Split first = firstSplit();
+            if (first.isSplitable(Split.Parts.Left)) ;
+            
             throw new NotImplementedException();
+        }
+
+        private Split firstSplit()
+        {
+            Matrix<double> e = getFirstEigenvector(B);
+            return new Split(getPartition(e), B);
         }
 
         private void computeModularityMatrix()
@@ -71,7 +80,7 @@ namespace fFormations
             return m * 0.5;
         }
 
-        //returns network modularity Q when the cut is partition
+        //returns network modularity Q when the cut is the partition
         private double getNetworkModularity(Matrix<double> partition)
         {
             double p = (partition.Transpose() * B * partition)[0, 0];
@@ -79,11 +88,11 @@ namespace fFormations
         }
 
         //returns 1 and -1 vector
-        private Matrix<double> getPartition(Matrix<double> vector)
+        private Matrix<double> getPartition(Matrix<double> eigenVector)
         {
-            Matrix<double> partition = Matrix<double>.Build.Dense(vector.RowCount, 1);
-            for (int i = 0; i < vector.RowCount; i++)
-                if (vector[i, 0] > 0)
+            Matrix<double> partition = Matrix<double>.Build.Dense(eigenVector.RowCount, 1);
+            for (int i = 0; i < eigenVector.RowCount; i++)
+                if (eigenVector[i, 0] > 0)
                     partition[i, 0] = 1;
                 else
                     partition[i, 0] = -1;
@@ -98,5 +107,34 @@ namespace fFormations
             Matrix<double> vectors = eigen.EigenVectors;
             return vectors.SubMatrix(0, vectors.RowCount, 0, 1); //returns only 1st vector
         }
+
+
+        class Split
+        {
+            private Matrix<double> s; //indicator vector
+            private Matrix<double> B; //modularity matrix
+            private List<int> right = new List<int>();
+            private List<int> left = new List<int>();
+            public enum Parts { Left, Right };
+
+            public Split(Matrix<double> indicatorVector, Matrix<double> modMatrix)
+            {
+                s = indicatorVector;
+                B = modMatrix;
+
+                for (int i = 0; i < s.RowCount; i++)
+                    if (s[i, 0] == 1) right.Add(i);
+                    else
+                        left.Add(i);
+            }
+
+            //checks if left or right part is splitable
+            public bool isSplitable(Parts group)
+            {
+                return false;
+            }
+
+        }
+
     }
 }

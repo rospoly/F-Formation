@@ -15,7 +15,7 @@ namespace fFormations
 
         public static Frame createFrame(int id, List<Person> people)
         {
-            return new Frame(id, people.Count, people);
+            return new Frame(id, people);
         }
     }
 }

@@ -70,7 +70,7 @@ namespace fFormations
             }
 
             int i = 0; //counter on data lines
-            int j = 0; //counter on gt lines
+           // int j = 0; //counter on gt lines
             while (i < dataLines?.Length)
             {
                 //first line has to be a frame header in both files
@@ -91,7 +91,7 @@ namespace fFormations
                             double x = Double.Parse(p.Groups[2].Value);
                             double y = Double.Parse(p.Groups[3].Value);
                             double theta = Double.Parse(p.Groups[4].Value);
-                            people.Add(FactoryPerson.createPerson(pId, x, y, theta)); //add the person to the list
+                            people.Add(FactoryPerson.createPerson(pId, x, y, theta, k)); //add the person to the list
                         }
                     }
 
@@ -99,7 +99,7 @@ namespace fFormations
                     frames.Add(FactoryFrame.createFrame(id, people));
 
                     //update i
-                    i = i + n_people;
+                    i = i + n_people + 1;
                 }
                 else
                 {
@@ -121,7 +121,7 @@ namespace fFormations
             //read lines from gt file
             try
             {
-                gtLines = File.ReadAllLines(DataFile);
+                gtLines = File.ReadAllLines(GtFile);
             }
             catch (FileNotFoundException e)
             {
@@ -159,7 +159,7 @@ namespace fFormations
                     //add the new grouping
                     groups.Add(newGroup);
                     //update i
-                    i = i + n;
+                    i = i + n + 1;
                 }
                 else
                 {
