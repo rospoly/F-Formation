@@ -42,4 +42,6 @@ namespace fFormations
             AdjacencyMatrix = Matrix<double>.Build.Dense(F.N, F.N, convert);
         }
     }
+
+
 }
