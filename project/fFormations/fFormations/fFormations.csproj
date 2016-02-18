@@ -66,6 +66,7 @@
     <Compile Include="IterationManager.cs" />
     <Compile Include="ModularityCut.cs" />
     <Compile Include="Proximity.cs" />
+    <Compile Include="Result.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

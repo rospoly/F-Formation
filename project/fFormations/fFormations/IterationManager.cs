@@ -20,17 +20,25 @@ namespace fFormations
 
         public void computeMethod()
         {
-            //ottieni data da DM
             a.computeAffinity();
             m.Initialize(a);
             computed= m.ComputeGroup();
         }
 
-        public Tuple<double,double,double> comparison() {
+        public CollectorResult comparison() {
+            Console.WriteLine("GroupList computed has size: "+computed.Count);
+            CollectorResult rs = new CollectorResult();
             foreach (Group g in computed) {
                 List<int> temp=Group.Compare(DM.getGTById(g.IdFrame.IdFrame), g);
-                //elaborate temp
+                rs.addResult(new Result(temp, g.IdFrame.IdFrame));
             }
+            //lista di tutti i risultati
+            rs.ToString();
+            //funzione di riduzione su tutti i risultati (ex.average)
+            //aggiunta alla fine di rs
+            //ritorno rs
+            rs.computation();
+            return rs;
         }
     }
 }
