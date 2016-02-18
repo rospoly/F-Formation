@@ -33,7 +33,6 @@ namespace fFormations
 
             computeNormTerm();
             computeModularityMatrix();
-            
         }
 
         public List<Group> ComputeGroup()

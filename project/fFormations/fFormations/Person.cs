@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,12 +25,11 @@ namespace fFormations
         private double coordX;
         private double coordY;
         private double angle;
-        private int helpLabel;
+        public int HelpLabel { get; private set; }
         public int ID { get; private set; }
 
         public double CoordX { get { return coordX; } set { if (value > 0) coordX = value; } }
         public double CoordY { get { return coordY; } set { if (value > 0) coordY = value; } }
-        public int HelpLabel { get; private set;}
         public double Angle { get { return angle; } set { if (Math.Abs(value) < Math.PI) angle = value; } }
 
         public Person(int id, double coordX, double coordY, double angle,int label) {
@@ -37,7 +37,7 @@ namespace fFormations
             this.CoordX = coordX;
             this.CoordY = coordY;
             this.Angle = angle;
-            helpLabel = label;
+            HelpLabel = label;
         }
 
         public static bool operator ==(Person a, Person b)
