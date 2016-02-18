@@ -19,6 +19,7 @@ namespace fFormations
         private Matrix<double> A; //affinity matrix
 
         //constructor, requires a data manager??????
+        // penso di no, è il gestoreIterazione l'unico ad iteragire con il data manager
         public ModularityCut(bool KL=false)
         {
             KLflag = KL; //if true, we apply kernighan-lin refinement
