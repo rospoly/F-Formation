@@ -43,5 +43,29 @@ namespace fFormations
         }
     }
 
+    class SMEFO :Proximity
+    {
+        Vector<double> pf;//smefo values 
+        Vector<double> centers;//centers of focus
+        public SMEFO(Frame f) : base(f)
+        {
+            Vector<double> pf = Vector<double>.Build.Dense(f.N);
+            Vector<double> center = Vector<double>.Build.Dense(f.N);
+        }
 
+        public void computeSMEFO() {
+            Vector<double> temp;
+            foreach (Person p in F.Persons) {
+                temp= AdjacencyMatrix.Column(p.HelpLabel);
+                foreach (Person j in F.Persons)
+                {
+                    if (j!= p)
+                    {
+
+                    }
+
+                }
+            }
+        }
+    }
 }

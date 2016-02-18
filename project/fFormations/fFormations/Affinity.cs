@@ -26,5 +26,8 @@ namespace fFormations
             Matrix<double> copy = AdjacencyMatrix.Clone();
             return copy;
         }
+        public static void main() {
+
+        }
     }
 }
