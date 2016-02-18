@@ -76,14 +76,11 @@ namespace fFormations
             else return null;
         }
 
-
-
-
         //associates frames and groups in an unique disctionary
         private void setDictionary()
         {
             foreach(Frame f in frames)
-            {
+            {      
                 Group g = groups.Find(x => x.IdFrame.IdFrame == f.IdFrame);
                 data.Add(f.IdFrame, new Tuple<Frame, Group>(f, g));
             }
