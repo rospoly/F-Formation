@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,11 +35,15 @@ namespace fFormations
             P.setDataFile(dataFile);
             P.setGTFile(gtFile);
             List<Frame> frames = P.readData();
+            Debug.WriteLine("Frames correctly read");
             List<Group> groups = P.readGT(frames);
+            Debug.WriteLine("GT correctly read");
+
 
             /* DATA MANAGER */
 
-            DataManager dm = new DataManager(dataFile, gtFile);
+            // DataManager dm = new DataManager(dataFile, gtFile);
+
 
 
             Console.ReadLine();

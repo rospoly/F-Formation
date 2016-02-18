@@ -1,7 +1,7 @@
 ﻿fFormations
 
 
-winexe
+exe
 C#
 .cs
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\
@@ -12,9 +12,9 @@ DEBUG;TRACE
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\App.xaml
 11151548125
 
-20455170360
+21-1448110645
 15-723021386
 MainWindow.xaml;
 
-False
+True
 
