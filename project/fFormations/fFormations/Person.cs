@@ -61,7 +61,7 @@ namespace fFormations
         }
 
         public double getDistance(Person p) {
-            return Math.Sqrt((CoordX - p.CoordX, 2)*(CoordX - p.CoordX,2)+(CoordY - p.CoordY,2)*(CoordY - p.CoordY,2));
+            return Math.Sqrt((CoordX - p.CoordX)*(CoordX - p.CoordX)+(CoordY - p.CoordY)*(CoordY - p.CoordY));
         }
 
         public int getLabel()
