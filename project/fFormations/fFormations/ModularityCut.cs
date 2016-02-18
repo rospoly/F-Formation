@@ -131,6 +131,14 @@ namespace fFormations
             //checks if left or right part is splitable
             public bool isSplitable(Parts group)
             {
+                List<int> currentGroup;
+                if (group == Parts.Left)
+                    currentGroup = left;
+                else
+                    currentGroup = right;
+
+
+
                 return false;
             }
 
