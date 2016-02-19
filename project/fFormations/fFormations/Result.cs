@@ -8,9 +8,6 @@ namespace fFormations
 {
     class Result
     {
-        //precision = temp[0] / (double)(temp[0] + temp[1]);
-        //recall=temp[0]/(double)(temp[0]+temp[2]);
-        //f1 = (2*precision* recall) / (precision+recall);
         double precision, recall, f1;
         int refIDFrame;
         public Result(List<int> temp, int IdFrame = -1) {

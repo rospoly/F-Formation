@@ -18,14 +18,21 @@ namespace fFormations
     }
     class ProxOrient : Affinity
     {
-        Vector vector1 = new Vector();
-        Vector vector2 = new Vector();
-        double angleij = 0;
-        double angleji = 0;
-        double valij = 0;
-        double valji = 0;
+        Vector vector1;
+        Vector vector2;
+        double angleij;
+        double angleji;
+        double valij;
+        double valji;
 
-        public ProxOrient(Frame f) : base(f) { }
+        public ProxOrient(Frame f) : base(f) {
+             vector1 = new Vector();
+             vector2 = new Vector();
+             angleij = 0;
+             angleji = 0;
+             valij = 0;
+             valji = 0;
+        }
 
         public void InitVectors(int i, int j) {
             //inizializzo i vettori
@@ -60,12 +67,12 @@ namespace fFormations
 
     class SMEFO :ProxOrient
     {
-        Vector<double> pf;//smefo values 
-        Vector<double> centers;//centers of focus
+        public Vector<double> pf;//smefo values 
+        public Vector<double> centers;//centers of focus
         public SMEFO(Frame f) : base(f)
         {
-            Vector<double> pf = Vector<double>.Build.Dense(f.N); 
-            Vector<double> center = Vector<double>.Build.Dense(f.N);
+             pf = Vector<double>.Build.Dense(f.N); 
+             centers = Vector<double>.Build.Dense(f.N);
         }
 
         public override double GetMeasure(int i)
