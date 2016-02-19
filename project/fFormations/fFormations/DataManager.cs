@@ -23,9 +23,6 @@ namespace fFormations
             id = idCounter;
             idCounter++;
 
-            //load files and build the dictionary
-            //loadFrames(framesPath);
-            //loadGT(GTPath);
             P.setDataFile(framesPath);
             frames = P.readData();
             P.setGTFile(GTPath);
@@ -34,23 +31,6 @@ namespace fFormations
             setDictionary();
         }
 
-        //private void loadFrames(string framesPath)
-        //{
-        //    P.setDataFile(framesPath);
-        //    frames = P.readData();
-        //}
-
-        //private void loadGT(string GTPath)
-        //{
-        //    if (frames != null)
-        //    {
-        //        P.setGTFile(GTPath);
-        //        groups = P.readGT(frames);
-
-        //        setDictionary();
-        //    }
-
-        //}
 
         //if frame id exists, returns the frame, otherwise null
         public Frame getFrameById(int id)
