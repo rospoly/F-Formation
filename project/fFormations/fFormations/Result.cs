@@ -38,7 +38,6 @@ namespace fFormations
         }
 
         public void computation() {
-            return null;
         }
 
         public override string ToString()

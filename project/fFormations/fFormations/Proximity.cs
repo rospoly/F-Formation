@@ -11,61 +11,101 @@ namespace fFormations
     class Proximity : Affinity
     {
         public Proximity(Frame f) : base(f) {}
-        public override void computeAffinity()
+        public override double HowToCompute(int i, int j)
         {
-            AdjacencyMatrix=Matrix<double>.Build.Dense(F.N, F.N, (i, j) => -Math.Exp(F.distances[i,j]/8));
+            return ComputationRegularAffinity(i, j);
         }
     }
     class ProxOrient : Affinity
     {
+        Vector vector1 = new Vector();
+        Vector vector2 = new Vector();
+        double angleij = 0;
+        double angleji = 0;
+        double valij = 0;
+        double valji = 0;
+
         public ProxOrient(Frame f) : base(f) { }
-        public override void computeAffinity()
+
+        public void InitVectors(int i, int j) {
+            //inizializzo i vettori
+            vector1.X = F.getPersonByHelpLabel(i).CoordX;
+            vector1.Y = F.getPersonByHelpLabel(i).CoordY;
+            vector2.X = F.getPersonByHelpLabel(j).CoordX;
+            vector2.Y = F.getPersonByHelpLabel(j).CoordY;
+            //angolo fra i due vettori, dovrebbero essere uguali a meno di un segno forse.
+            //angolo misurato in gradi quindi converto in radianti
+            angleij = Vector.AngleBetween(vector1, vector2) * Math.PI / 180;
+            angleji = Vector.AngleBetween(vector2, vector1) * Math.PI / 180;//dovrebbe cambiare solo il segno
+        }
+
+        public override double HowToCompute(int i, int j) {
+            InitVectors(i, j);
+            //In questo caso mi serve l'angolo della prima persona e quello della seconda
+            valij = GetMeasure(i) - angleij;
+            valji = GetMeasure(j) - angleji;
+            //Secondo me la ComputationRegularAffinity(i,j)=ComputationRegularAffinity(j,i)
+            //Se entrambe le condizioni sono verificate, devo calcolare il valore
+            //Se una delle due condizioni è falsa prendo 0, siccome la computazione
+            //coinvolge un'esponenziale allora 0 è sicuramente minore.
+            return ConditionRegularAffinity(valij) ? ConditionRegularAffinity(valij) ? ComputationRegularAffinity(i, j) : 0 : 0;
+        }
+
+        public virtual double GetMeasure(int i)
         {
-            Vector vector1 = new Vector();
-            Vector vector2 = new Vector();
-            double angleij=0;
-            double angleji =0; 
-            double valij =0;
-            double valji = 0;
-            Func<int, int, double> convert = delegate (int i, int j)
-            {
-                 vector1.X = F.getPersonByHelpLabel(i).CoordX;
-                 vector1.Y = F.getPersonByHelpLabel(i).CoordY;
-                 vector2.X = F.getPersonByHelpLabel(j).CoordX;
-                 vector2.Y = F.getPersonByHelpLabel(j).CoordY;
-                 angleij = Vector.AngleBetween(vector1, vector2) * Math.PI / 180;
-                 angleji = Vector.AngleBetween(vector2, vector1) * Math.PI / 180;//dovrebbe cambiare solo il segno
-                 valij = (F.getPersonByHelpLabel(i).Angle - angleij);
-                 valji = (F.getPersonByHelpLabel(j).Angle - angleji);
-                 return ((valij <= -Math.PI / 2 && valij >= Math.PI / 2) || (valji <= -Math.PI / 2 && valji >= Math.PI / 2)) ? -Math.Exp(F.distances[i, j] / 8) : 0;
-            };
-            AdjacencyMatrix = Matrix<double>.Build.Dense(F.N, F.N, convert);
+            //Nel caso di Prox e Orien confronto l'angolo della persona con label i
+            return F.getPersonByHelpLabel(i).Angle;
         }
     }
 
-    class SMEFO :Proximity
+    class SMEFO :ProxOrient
     {
         Vector<double> pf;//smefo values 
         Vector<double> centers;//centers of focus
         public SMEFO(Frame f) : base(f)
         {
-            Vector<double> pf = Vector<double>.Build.Dense(f.N);
+            Vector<double> pf = Vector<double>.Build.Dense(f.N); 
             Vector<double> center = Vector<double>.Build.Dense(f.N);
         }
 
-        public void computeSMEFO() {
-            Vector<double> temp;
-            foreach (Person p in F.Persons) {
-                temp= AdjacencyMatrix.Column(p.HelpLabel);
-                foreach (Person j in F.Persons)
-                {
-                    if (j!= p)
-                    {
+        public override double GetMeasure(int i)
+        {
+            //Qui uso lo SMEFO della persona con label i
+            return computeSMEFO(F.getPersonByHelpLabel(i));
+        }
+        /// <summary>
+        /// Arcocoseno dell' angolo tra il vettore della posizione della persona i e il suo centro di focus
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public double computeSMEFO(Person i) {
+            return Math.Acos(Vector.AngleBetween(new Vector(i.CoordX,i.CoordY),FocusCenters(i)));
+        }
 
-                    }
-
-                }
+        /// <summary>
+        /// Centro di focus della persona i
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public Vector FocusCenters(Person i) {
+            double sumx = 0;
+            double sumy = 0;
+            foreach (Person j in F.Persons) {
+                sumx = sumx + j.CoordX * AdjacencyMatrix[i.HelpLabel, j.HelpLabel];
+                sumy = sumy + j.CoordY * AdjacencyMatrix[i.HelpLabel, j.HelpLabel];
             }
+            double degree = totalDegreeOf(i);
+            return new Vector(sumx / degree, sumy / degree);
+        }
+
+        /// <summary>
+        /// Calcola il grado della persona i nei confronti di tutti gli altri
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public double totalDegreeOf(Person i)
+        {
+            return AdjacencyMatrix.Column(i.HelpLabel).Sum();
         }
     }
 }
