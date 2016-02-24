@@ -18,6 +18,8 @@ namespace fFormations
         private Matrix<double> B; //modularity matrix
         private Matrix<double> A; //affinity matrix
 
+        private List<Split> groups;
+
         //constructor, requires a data manager??????
         // penso di no, è il gestoreIterazione l'unico ad iteragire con il data manager
         public ModularityCut(bool KL=false)
@@ -30,23 +32,48 @@ namespace fFormations
             affinity = a;
             A = affinity.getCopyMatrix();
             N = affinity.getDimensionAM();
-
+            
             computeNormTerm();
             computeModularityMatrix();
         }
 
         public List<Group> ComputeGroup()
         {
-            Split first = firstSplit();
-            if (first.isSplitable(Split.Parts.Left)) ;
-            
-            throw new NotImplementedException();
+            groups = new List<Split>();
+            List<Group> result = new List<Group>();
+
+            Tuple<Split, Split> first = firstSplit();
+            if (first.Item1 != null) groups.Add(first.Item1);
+
+            groups.Add(first);
+
+
+            foreach (Split s in groups)
+            {
+                foreach(int n in s.members)
+                {
+                    Group g = new Group()
+                }
+            }
+
+            return result;
         }
 
-        private Split firstSplit()
+        private Tuple<Split, Split> firstSplit()
         {
             Matrix<double> e = getFirstEigenvector(B);
-            return new Split(getPartition(e), B);
+            Matrix<double> partition = getPartition(e);
+
+            List<int> group1 = new List<int>();
+            List<int> group2 = new List<int>();
+
+            for (int i = 0; i< partition.RowCount; i++)
+            {
+                if (partition[i, 0] > 1) group1.Add(i);
+                else group2.Add(i);
+            }
+
+            return new Tuple<Split, Split>(new Split(group1), new Split(group2));
         }
 
         private void computeModularityMatrix()
@@ -111,34 +138,17 @@ namespace fFormations
 
         class Split
         {
-            private Matrix<double> s; //indicator vector
-            private Matrix<double> B; //modularity matrix
-            private List<int> right = new List<int>();
-            private List<int> left = new List<int>();
-            public enum Parts { Left, Right };
+            public List<int> members = new List<int>();
 
-            public Split(Matrix<double> indicatorVector, Matrix<double> modMatrix)
+            public Split(List<int> members)
             {
-                s = indicatorVector;
-                B = modMatrix;
-
-                for (int i = 0; i < s.RowCount; i++)
-                    if (s[i, 0] == 1) right.Add(i);
-                    else
-                        left.Add(i);
+                this.members = members;
             }
 
-            //checks if left or right part is splitable
-            public bool isSplitable(Parts group)
+            //checks if this split is splitable
+            public bool isSplitable()
             {
-                List<int> currentGroup;
-                if (group == Parts.Left)
-                    currentGroup = left;
-                else
-                    currentGroup = right;
-
-
-
+                // ---????
                 return false;
             }
 
