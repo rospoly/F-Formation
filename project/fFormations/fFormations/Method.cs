@@ -9,6 +9,6 @@ namespace fFormations
     public interface Method
     {
         void Initialize(Affinity a);
-        List<Group> ComputeGroup();
+        Group ComputeGroup();
     }
 }
