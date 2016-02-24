@@ -12,6 +12,7 @@ namespace fFormations
     {
         private DataManager dataManager;
         private Affinity affinity; //affinity matrix
+        
         private int N; //elements
         private double m; //normalization term
         private bool KLflag = false;
@@ -37,23 +38,24 @@ namespace fFormations
             computeModularityMatrix();
         }
 
-        public List<Group> ComputeGroup()
+        public Group ComputeGroup()
         {
             groups = new List<Split>();
-            List<Group> result = new List<Group>();
+            Group result = new Group(affinity.F);
 
             Tuple<Split, Split> first = firstSplit();
             if (first.Item1 != null) groups.Add(first.Item1);
-
-            groups.Add(first);
+            if (first.Item2 != null) groups.Add(first.Item2);
 
 
             foreach (Split s in groups)
             {
-                foreach(int n in s.members)
+                List<Person> p = new List<Person>();
+                foreach (int n in s.members)
                 {
-                    Group g = new Group()
+                    p.Add(affinity.F.getPersonByHelpLabel(n));
                 }
+                result.addSubGroup(p);
             }
 
             return result;

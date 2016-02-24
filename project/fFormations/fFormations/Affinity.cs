@@ -10,7 +10,7 @@ namespace fFormations
     public abstract class Affinity
     {
         protected Matrix<double> AdjacencyMatrix { get; set; }
-        protected Frame F { get; private set; }
+        public Frame F { get; private set; }
 
         public Affinity(Frame f)
         {
