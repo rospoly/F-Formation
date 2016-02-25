@@ -11,14 +11,15 @@ namespace fFormations
     public class ModularityCut : Method
     {
         private DataManager dataManager;
-        private Affinity affinity; //affinity matrix
+        protected Affinity affinity; //affinity matrix
         
         private int N; //elements
         private double m; //normalization term
         private bool KLflag = false;
-        private Matrix<double> B; //modularity matrix
+        private Matrix<double> B; //modularity matrix for entire network
         private Matrix<double> A; //affinity matrix
 
+        private Split firstSplit;
         private List<Split> groups;
 
         //constructor, requires a data manager??????
@@ -33,9 +34,15 @@ namespace fFormations
             affinity = a;
             A = affinity.getCopyMatrix();
             N = affinity.getDimensionAM();
-            
+
+            List<int> elementsID = new List<int>(); //contains all helplabels
+            for (int i = 0; i < N; i++)
+                elementsID.Add(a.F.Persons[i].HelpLabel);
+
             computeNormTerm();
             computeModularityMatrix();
+
+            firstSplit = new Split(elementsID, this); //the first split contains all elements
         }
 
         public Group ComputeGroup()
@@ -43,10 +50,10 @@ namespace fFormations
             groups = new List<Split>();
             Group result = new Group(affinity.F);
 
-            Tuple<Split, Split> first = firstSplit();
-            if (first.Item1 != null) groups.Add(first.Item1);
-            if (first.Item2 != null) groups.Add(first.Item2);
-
+            Tuple<List<int>, List<int>> first;
+            firstSplit.divide(out first);
+            if (first.Item1 != null) groups.Add(new Split(first.Item1, this));
+            if (first.Item2 != null) groups.Add(new Split(first.Item2, this));
 
             foreach (Split s in groups)
             {
@@ -61,23 +68,9 @@ namespace fFormations
             return result;
         }
 
-        private Tuple<Split, Split> firstSplit()
-        {
-            Matrix<double> e = getFirstEigenvector(B);
-            Matrix<double> partition = getPartition(e);
+        
 
-            List<int> group1 = new List<int>();
-            List<int> group2 = new List<int>();
-
-            for (int i = 0; i< partition.RowCount; i++)
-            {
-                if (partition[i, 0] > 1) group1.Add(i);
-                else group2.Add(i);
-            }
-
-            return new Tuple<Split, Split>(new Split(group1), new Split(group2));
-        }
-
+        //compute values for matrix B
         private void computeModularityMatrix()
         {
             //create empty B
@@ -116,42 +109,112 @@ namespace fFormations
             return p / (4 * m);
         }
 
-        //returns 1 and -1 vector
-        private Matrix<double> getPartition(Matrix<double> eigenVector)
-        {
-            Matrix<double> partition = Matrix<double>.Build.Dense(eigenVector.RowCount, 1);
-            for (int i = 0; i < eigenVector.RowCount; i++)
-                if (eigenVector[i, 0] > 0)
-                    partition[i, 0] = 1;
-                else
-                    partition[i, 0] = -1;
-
-            return partition;
-        }
-
-        //returns the first eigenvector of the matrix
-        private Matrix<double> getFirstEigenvector(Matrix<double> matrix)
-        {
-            Evd<double> eigen = matrix.Evd();
-            Matrix<double> vectors = eigen.EigenVectors;
-            return vectors.SubMatrix(0, vectors.RowCount, 0, 1); //returns only 1st vector
-        }
 
 
         class Split
         {
+            private ModularityCut modCut; //parent modularity cut
             public List<int> members = new List<int>();
+            public Matrix<double> B; //mod matrix of the current subgraph
+            private int n;
 
-            public Split(List<int> members)
+       /*     public Split(List<int> members)
             {
                 this.members = members;
+                
+               // B = modularityMatrix;
             }
 
-            //checks if this split is splitable
-            public bool isSplitable()
+        /*    public Split(List<int> members, Matrix<double> networkModularityMatrix)
             {
-                // ---????
-                return false;
+                this.members = members;
+                n = members.Count;
+                computeGroupModularityMatrix(networkModularityMatrix);
+            } */
+
+            public Split(List<int> members, ModularityCut mc)
+            {
+                this.members = members;
+                n = members.Count;
+                computeGroupModularityMatrix(mc.B);
+                modCut = mc;
+            }
+
+            //computes B(g) for the current split
+            private void computeGroupModularityMatrix(Matrix<double> networkB)
+            {
+                B = Matrix<double>.Build.Dense(n, n);
+                for (int i = 0; i < n; i++)
+                    for (int j = 0; j < n; j++)
+                        if (i != j) B[i, j] = networkB[i, j];
+                        else
+                        {
+                            double sum = 0;
+                            foreach (int p in members)
+                                sum = sum + networkB[i, p];
+                            B[i, j] = networkB[i, j] - sum;
+                        }
+            }
+
+            public bool divide(out Tuple<List<int>, List<int>> result)
+            {
+                Matrix<double> e = getFirstEigenvector(B); //get first eigenvector of modularity matrix of the split
+                Matrix<double> partition = getPartition(e);
+
+                if (!isSplitable(partition)) //if the current split is no further divisible (deltaQ not negative)
+                {
+                    result = null;
+                    return false;
+                }
+
+                List<int> group1 = new List<int>();
+                List<int> group2 = new List<int>();
+
+                for (int i = 0; i < partition.RowCount; i++)
+                {
+                    if (partition[i, 0] > 1) group1.Add(i);
+                    else group2.Add(i);
+                }
+
+                result = new Tuple<List<int>, List<int>>(group1, group2);
+                return true;
+            }
+
+            //checks if the proposed split is acceptable
+            public bool isSplitable(Matrix<double> partitionVector)
+            {
+                //construct matrix S of 0/1
+                int nSubGroups = 2;
+                Matrix<double> S = Matrix<double>.Build.Dense(n, nSubGroups); // we have 2 sub-communities
+                for (int i = 0; i < n; i++)
+                    if (partitionVector[i, 0] == 1) S[i, 0] = 1;
+                    else S[i, 1] = 1;
+
+                double deltaQ = (1 / (2 * modCut.m)) * (S.Transpose() * B * S).Trace();
+
+                if (deltaQ < 0) return true; //modularity decreases, we can split
+                else return false;
+            }
+
+            //returns the first eigenvector of the matrix
+            private Matrix<double> getFirstEigenvector(Matrix<double> matrix)
+            {
+                Evd<double> eigen = matrix.Evd();
+                Matrix<double> vectors = eigen.EigenVectors;
+                return vectors.SubMatrix(0, vectors.RowCount, 0, 1); //returns only 1st vector
+            }
+
+            //returns 1 and -1 vector
+            private Matrix<double> getPartition(Matrix<double> eigenVector)
+            {
+                Matrix<double> partition = Matrix<double>.Build.Dense(eigenVector.RowCount, 1);
+                for (int i = 0; i < eigenVector.RowCount; i++)
+                    if (eigenVector[i, 0] > 0)
+                        partition[i, 0] = 1;
+                    else
+                        partition[i, 0] = -1;
+
+                return partition;
             }
 
         }
