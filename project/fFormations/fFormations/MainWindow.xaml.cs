@@ -44,6 +44,7 @@ namespace fFormations
 
             // DataManager dm = new DataManager(dataFile, gtFile);
 
+//            ModularityCut mc = new ModularityCut();
 
 
             Console.ReadLine();
