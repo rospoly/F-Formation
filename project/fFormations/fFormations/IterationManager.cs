@@ -8,21 +8,28 @@ namespace fFormations
 {
     class IterationManager
     {
-        private DataManager DM;
-        private Method m;
-        private Affinity a;
-        private List<Group> computed;
-        public IterationManager(DataManager DM, Method m, Affinity a) {
+        public DataManager DM;
+        public List<Group> computed;
+        
+        public IterationManager(DataManager DM) {
             this.DM = DM;
-            this.m = m;
-            this.a = a;
+            computed = new List<Group>();
         }
 
-        public void computeMethod()
+        public void computeMethod(Method m, Affinity a)
         {
             a.computeAffinity();
             m.Initialize(a);
-            computed= m.ComputeGroup();
+            computed.Add(m.ComputeGroup());
+        }
+
+        public void computeMethod(Method m, List<Affinity> a)
+        {
+            foreach (Affinity affinity in a) {
+                affinity.computeAffinity();
+                m.Initialize(affinity);
+                computed.Add(m.ComputeGroup());
+            }
         }
 
         public CollectorResult comparison() {
