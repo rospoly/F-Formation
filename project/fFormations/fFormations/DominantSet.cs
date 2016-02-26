@@ -165,16 +165,15 @@ namespace fFormations
                         lp.Add(i);
                     }
                 }
+                WeightedAffinity wa = new WeightedAffinity(matrix);
+
                 for (i = 0; i < vector.Count; i++)
                 {
                     if (!lp.Contains(i))
                     {
-                        Vector<double> temp = matrix.Row(i);
-                        Matrix<double> myt = temp.ToRowMatrix();
-                        foreach(int k in lp)
-                            myt.RemoveColumn(k);
-                        temp = myt.Row(0);
-                        WeightedAffinity.Weight()
+                        temp.Add(i);
+                        Matrix<double> m=wa.convertListToMatrix(lp);
+                        if (wa.Weight(m,lp.Count-1))
                         //prova a inserire dentro e calcolare il risultato
                         //se positivo allora ci sta bene!!
                     }
@@ -187,6 +186,7 @@ namespace fFormations
         {
             return DeltaValue;
         }
+
         public class WeightedAffinity
         {
             Matrix<double> affinity;
