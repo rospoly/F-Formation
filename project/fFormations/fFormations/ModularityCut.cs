@@ -20,7 +20,7 @@ namespace fFormations
         private Matrix<double> A; //affinity matrix
 
         private Split firstSplit;
-        private List<Split> groups;
+      //  private List<Split> groups;
 
         //constructor, requires a data manager??????
         // penso di no, è il gestoreIterazione l'unico ad iteragire con il data manager
@@ -47,13 +47,35 @@ namespace fFormations
 
         public Group ComputeGroup()
         {
-            groups = new List<Split>();
+            List<Split> groups = new List<Split>();
             Group result = new Group(affinity.F);
 
-            Tuple<List<int>, List<int>> first;
-            firstSplit.divide(out first);
-            if (first.Item1 != null) groups.Add(new Split(first.Item1, this));
-            if (first.Item2 != null) groups.Add(new Split(first.Item2, this));
+            Queue<Split> q = new Queue<Split>();
+            q.Enqueue(firstSplit);
+            groups.Add(firstSplit);
+
+            while (q.Count != 0)
+            {
+                Tuple<List<int>, List<int>> res;
+                Split current = q.Dequeue();
+                if(current.divide(out res))
+                {
+                    groups.Remove(current); //remove current split --> usa equals
+                    if (res.Item1 != null)
+                    {
+                        Split sub1 = new Split(res.Item1, this);
+                        groups.Add(sub1);
+                        q.Enqueue(sub1);
+                    }
+                    if (res.Item2 != null)
+                    {
+                        Split sub2 = new Split(res.Item2, this);
+                        groups.Add(sub2);
+                        q.Enqueue(sub2);
+                    }
+                }
+
+            }
 
             foreach (Split s in groups)
             {
@@ -111,31 +133,17 @@ namespace fFormations
 
 
 
-        class Split
+        class Split: IEquatable<Split>
         {
-            private ModularityCut modCut; //parent modularity cut
+            private ModularityCut modCut; //parent modularity cut object
             public List<int> members = new List<int>();
             public Matrix<double> B; //mod matrix of the current subgraph
             private int n;
 
-       /*     public Split(List<int> members)
-            {
-                this.members = members;
-                
-               // B = modularityMatrix;
-            }
-
-        /*    public Split(List<int> members, Matrix<double> networkModularityMatrix)
-            {
-                this.members = members;
-                n = members.Count;
-                computeGroupModularityMatrix(networkModularityMatrix);
-            } */
-
             public Split(List<int> members, ModularityCut mc)
             {
                 this.members = members;
-                n = members.Count;
+                n = members.Count; //elements in THIS split
                 computeGroupModularityMatrix(mc.B);
                 modCut = mc;
             }
@@ -172,8 +180,8 @@ namespace fFormations
 
                 for (int i = 0; i < partition.RowCount; i++)
                 {
-                    if (partition[i, 0] > 1) group1.Add(i);
-                    else group2.Add(i);
+                    if (partition[i, 0] > 1) group1.Add(members[i]);
+                    else group2.Add(members[i]);
                 }
 
                 result = new Tuple<List<int>, List<int>>(group1, group2);
@@ -217,6 +225,16 @@ namespace fFormations
                 return partition;
             }
 
+            public bool Equals(Split other)
+            {
+                foreach (int a in members)
+                {
+                    if (!other.members.Contains(a))
+                        return false;
+                }
+
+                return true;
+            }
         }
 
     }
