@@ -44,8 +44,31 @@ namespace fFormations
             }
         }
 
+        public void ReassignHelpLabel()
+        {
+            int i = 0;
+            foreach (Person p in Persons)
+            {
+                p.HelpLabel = i;
+                i++;
+            }
+        }
+
+        public void RemovePerson(Person p) {
+            Persons.Remove(p);
+            this.N = Persons.Count;
+            distances = Matrix<double>.Build.Dense(N, N);
+            computeDistances();
+            ReassignHelpLabel();
+        }
+
+        public Frame getCopyFrame()
+        {
+            return FactoryFrame.createFrame(IdFrame, new List<Person>(Persons));
+        }
+
         //public double getDistances(Person p, Person j) {
-            //return ((Persons.Contains(p) && Persons.Contains(j)) ? p.getDistance(j) : -1);
+        //return ((Persons.Contains(p) && Persons.Contains(j)) ? p.getDistance(j) : -1);
         //}
 
         //returns null if the id does not exists in the frame

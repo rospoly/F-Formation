@@ -25,7 +25,7 @@ namespace fFormations
         private double coordX;
         private double coordY;
         private double angle;
-        public int HelpLabel { get; private set; }
+        public int HelpLabel { get; set; }
         public int ID { get; private set; }
 
         public double CoordX { get { return coordX; } set { if (value > 0) coordX = value; } }
