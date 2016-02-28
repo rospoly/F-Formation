@@ -13,8 +13,8 @@ namespace fFormations
         private static int idCounter = 0;
 
         private int id {get;}
-        private readonly List<Frame> frames;
-        private readonly List<Group> groups;
+        private List<Frame> frames;
+        private List<Group> groups;
 
         private Dictionary<int, Tuple<Frame, Group>> data { get; }
 
@@ -28,9 +28,15 @@ namespace fFormations
             P.setGTFile(GTPath);
             groups = P.readGT(frames);
 
+            data = new Dictionary<int, Tuple<Frame, Group>>();
             setDictionary();
         }
 
+        public List<Frame> getAllFrames()
+        {
+            //da modificare
+            return frames;
+        }
 
         //if frame id exists, returns the frame, otherwise null
         public Frame getFrameById(int id)

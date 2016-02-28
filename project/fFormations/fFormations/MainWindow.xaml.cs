@@ -41,10 +41,17 @@ namespace fFormations
 
 
             /* DATA MANAGER */
+           // DataManager dm = new DataManager(dataFile, gtFile);
 
-            // DataManager dm = new DataManager(dataFile, gtFile);
-
-//            ModularityCut mc = new ModularityCut();
+            foreach(Frame f in frames)
+            {
+                Affinity aff = new Proximity(f);
+                ModularityCut mc = new ModularityCut();
+                mc.Initialize(aff);
+                Group g = mc.ComputeGroup();
+                Console.WriteLine(g);
+            }
+            
 
 
             Console.ReadLine();
