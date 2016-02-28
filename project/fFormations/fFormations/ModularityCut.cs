@@ -10,7 +10,6 @@ namespace fFormations
 {
     public class ModularityCut : Method
     {
-        private DataManager dataManager;
         protected Affinity affinity; //affinity matrix
         
         private int N; //elements
@@ -20,10 +19,7 @@ namespace fFormations
         private Matrix<double> A; //affinity matrix
 
         private Split firstSplit;
-      //  private List<Split> groups;
 
-        //constructor, requires a data manager??????
-        // penso di no, è il gestoreIterazione l'unico ad iteragire con il data manager
         public ModularityCut(bool KL=false)
         {
             KLflag = KL; //if true, we apply kernighan-lin refinement
@@ -61,20 +57,19 @@ namespace fFormations
                 if(current.divide(out res))
                 {
                     groups.Remove(current); //remove current split --> usa equals
-                    if (res.Item1 != null)
+                    if (res.Item1 != null && res.Item1.Count != 0)
                     {
                         Split sub1 = new Split(res.Item1, this);
                         groups.Add(sub1);
                         q.Enqueue(sub1);
                     }
-                    if (res.Item2 != null)
+                    if (res.Item2 != null && res.Item2.Count != 0)
                     {
                         Split sub2 = new Split(res.Item2, this);
                         groups.Add(sub2);
                         q.Enqueue(sub2);
                     }
                 }
-
             }
 
             foreach (Split s in groups)
@@ -90,8 +85,6 @@ namespace fFormations
             return result;
         }
 
-        
-
         //compute values for matrix B
         private void computeModularityMatrix()
         {
@@ -101,11 +94,11 @@ namespace fFormations
             for (int i = 0; i < N; i++)
                 for(int j = 0; j < N; j++)
                 {
-                    B[i, j] = A[i, j] - (expectedDegree(i) * expectedDegree(j)) / 2 * m;
+                    B[i, j] = A[i, j] - ((expectedDegree(i) * expectedDegree(j)) / (2 * m));
                 }
         }
 
-        //gives expected degree of element i wrt affinity matrix
+        //gives expected degree of element i wrt affinity matrix, k_i = sum(j) a_ij
         private double expectedDegree(int i)
         {
             double exp = 0;
@@ -114,7 +107,7 @@ namespace fFormations
             return exp;
         }
 
-        //compute normalization term m
+        //compute normalization term m = 0.5 * somma(i,j) a_ij
         private double computeNormTerm()
         {
             m = 0;
@@ -137,7 +130,7 @@ namespace fFormations
         {
             private ModularityCut modCut; //parent modularity cut object
             public List<int> members = new List<int>();
-            public Matrix<double> B; //mod matrix of the current subgraph
+            public Matrix<double> Bg; //mod matrix of the current subgraph
             private int n;
 
             public Split(List<int> members, ModularityCut mc)
@@ -151,25 +144,25 @@ namespace fFormations
             //computes B(g) for the current split
             private void computeGroupModularityMatrix(Matrix<double> networkB)
             {
-                B = Matrix<double>.Build.Dense(n, n);
+                Bg = Matrix<double>.Build.Dense(n, n);
                 for (int i = 0; i < n; i++)
                     for (int j = 0; j < n; j++)
-                        if (i != j) B[i, j] = networkB[i, j];
+                        if (i != j) Bg[i, j] = networkB[i, j];
                         else
                         {
                             double sum = 0;
                             foreach (int p in members)
                                 sum = sum + networkB[i, p];
-                            B[i, j] = networkB[i, j] - sum;
+                            Bg[i, j] = networkB[i, j] - sum;
                         }
             }
 
             public bool divide(out Tuple<List<int>, List<int>> result)
             {
-                Matrix<double> e = getFirstEigenvector(B); //get first eigenvector of modularity matrix of the split
+                Matrix<double> e = getFirstEigenvector(Bg); //get first eigenvector of modularity matrix of the split
                 Matrix<double> partition = getPartition(e);
 
-                if (!isSplitable(partition)) //if the current split is no further divisible (deltaQ not negative)
+                if (!isSplitable(partition) || members.Count <= 1) //if the current split is no further divisible (deltaQ not negative)
                 {
                     result = null;
                     return false;
@@ -180,7 +173,7 @@ namespace fFormations
 
                 for (int i = 0; i < partition.RowCount; i++)
                 {
-                    if (partition[i, 0] > 1) group1.Add(members[i]);
+                    if (partition[i, 0] == 1) group1.Add(members[i]);
                     else group2.Add(members[i]);
                 }
 
@@ -198,7 +191,7 @@ namespace fFormations
                     if (partitionVector[i, 0] == 1) S[i, 0] = 1;
                     else S[i, 1] = 1;
 
-                double deltaQ = (1 / (2 * modCut.m)) * (S.Transpose() * B * S).Trace();
+                double deltaQ = (1 / (2 * modCut.m)) * (S.Transpose() * Bg * S).Trace();
 
                 if (deltaQ < 0) return true; //modularity decreases, we can split
                 else return false;
@@ -209,7 +202,7 @@ namespace fFormations
             {
                 Evd<double> eigen = matrix.Evd();
                 Matrix<double> vectors = eigen.EigenVectors;
-                return vectors.SubMatrix(0, vectors.RowCount, 0, 1); //returns only 1st vector
+                return vectors.SubMatrix(0, vectors.RowCount, vectors.ColumnCount-1, 1); //returns only 1st vector
             }
 
             //returns 1 and -1 vector
@@ -234,6 +227,14 @@ namespace fFormations
                 }
 
                 return true;
+            }
+
+            public override string ToString()
+            {
+                string s = "Split: ";
+                foreach (int i in members)
+                    s = s + i + " ";
+                return s;
             }
         }
 

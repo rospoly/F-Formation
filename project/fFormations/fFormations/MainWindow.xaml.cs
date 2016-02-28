@@ -43,13 +43,16 @@ namespace fFormations
             /* DATA MANAGER */
            // DataManager dm = new DataManager(dataFile, gtFile);
 
+            /* MODULARITY CUT TEST */
+
             foreach(Frame f in frames)
             {
                 Affinity aff = new Proximity(f);
                 ModularityCut mc = new ModularityCut();
                 mc.Initialize(aff);
                 Group g = mc.ComputeGroup();
-                Console.WriteLine(g);
+                Debug.WriteLine("Frame " + f.IdFrame);
+                Debug.WriteLine(g);
             }
             
 
