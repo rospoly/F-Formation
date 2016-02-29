@@ -44,23 +44,25 @@ namespace fFormations
             }
         }
 
-        public void ReassignHelpLabel()
-        {
-            int i = 0;
-            foreach (Person p in Persons)
+        /// <summary>
+        /// Correct the help label of the Person in the frame after the
+        /// elimination of one of them
+        /// </summary>
+        /// <param name="p"></param>
+        /*public void CorrectHelpLabel(Person p){
+            for (int i=p.HelpLabel;i< N; i++)
             {
-                p.HelpLabel = i;
-                i++;
+                Persons[i].HelpLabel
             }
-        }
+        }*/
 
-        public void RemovePerson(Person p) {
+        /*public void RemovePerson(Person p) {
             Persons.Remove(p);
             this.N = Persons.Count;
-            distances = Matrix<double>.Build.Dense(N, N);
-            computeDistances();
+            distances.RemoveColumn(p.HelpLabel);
+            distances.RemoveRow(p.HelpLabel);
             ReassignHelpLabel();
-        }
+        }*/
 
         public Frame getCopyFrame()
         {

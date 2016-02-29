@@ -42,8 +42,8 @@ namespace fFormations
             vector2.Y = F.getPersonByHelpLabel(j).CoordY;
             //angolo fra i due vettori, dovrebbero essere uguali a meno di un segno forse.
             //angolo misurato in gradi quindi converto in radianti
-            angleij = Vector.AngleBetween(vector1, vector2) * Math.PI / 180;
-            angleji = Vector.AngleBetween(vector2, vector1) * Math.PI / 180;//dovrebbe cambiare solo il segno
+            angleij = Vector.AngleBetween(vector1, vector2) * Math.PI / 180.0;
+            angleji = Vector.AngleBetween(vector2, vector1) * Math.PI / 180.0;//dovrebbe cambiare solo il segno
         }
 
         public override double HowToCompute(int i, int j) {
@@ -55,7 +55,13 @@ namespace fFormations
             //Se entrambe le condizioni sono verificate, devo calcolare il valore
             //Se una delle due condizioni è falsa prendo 0, siccome la computazione
             //coinvolge un'esponenziale allora 0 è sicuramente minore.
-            return ConditionRegularAffinity(valij) ? ConditionRegularAffinity(valij) ? ComputationRegularAffinity(i, j) : 0 : 0;
+            if (ConditionRegularAffinity(valij) && ConditionRegularAffinity(valji))
+            {
+                if (ComputationRegularAffinity(i, j) != ComputationRegularAffinity(j, i))
+                    Console.WriteLine();
+                return ComputationRegularAffinity(i, j);
+            }
+            return 0;
         }
 
         public virtual double GetMeasure(int i)
