@@ -107,7 +107,7 @@ namespace fFormations
                     i++;
                 }
             }
-            Debug.WriteLine("Frames created: " + frames.Count + " frames");
+            Debug.WriteLine("Parser: Frames created: " + frames.Count + " frames");
             return frames;
         }
 
@@ -167,7 +167,7 @@ namespace fFormations
                     i++;
                 }
             }
-            Debug.WriteLine("Groups created: " + groups.Count + " grouping");
+            Debug.WriteLine("Parser: Groups created: " + groups.Count + " grouping");
             return groups;
         }
 

@@ -77,5 +77,20 @@ namespace fFormations
             myList.Add(correct);
             return myList;
         }
+
+        public override string ToString()
+        {
+            string s = "Groups: ";
+            foreach (List<Person> g in Grouping.Values)
+            {
+                s = s + "{ ";
+                foreach (Person p in g)
+                {
+                    s = s + p.ID + " ";
+                }
+                s = s + "}; ";
+            }
+            return s;
+        }
     }
 }
