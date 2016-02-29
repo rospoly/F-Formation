@@ -22,7 +22,7 @@ namespace fFormations
         //Vector rispetta la regola sul label
         public DominantSet(double DeltaZero)
         {
-
+            this.DeltaZero = DeltaZero;
         }
 
         public void Initialize(Affinity a)
@@ -44,18 +44,21 @@ namespace fFormations
                 if (CheckValidFunction())
                 {
                     List<int> temp = FindDominantGroup();
-                    if (StoppingCriterium(temp))
+                    if (!StoppingCriterium(temp))
                     {
-                        //g.addSubGroup(temp);
-                        RemoveDominantGroup(temp);
+                        g.addAllSingletons(allSingletons());
+                        indexes.Clear();
                     }
                     else
                     {
-                        temp = allSingletons();
-                        RemoveDominantGroup(temp);
-                        //g.addSubGroup(temp);
+                        List<int> pers = new List<int>();
+                        foreach (int j in temp)
+                        {
+                            pers.Add(indexes[j]);
+                        }
+                        g.addSubGroup(pers);
+                        RemoveDominantGroup(temp, pers);
                     }
-                    g.addSubGroup(temp);
                 }
             }
             return g;
@@ -68,7 +71,7 @@ namespace fFormations
         public void ResetVector()
         {
             //vettore colonna
-            vector = Matrix<double>.Build.Dense(matrix.ColumnCount, 0, 1.0 / (double)matrix.ColumnCount);
+            vector = Matrix<double>.Build.Dense(matrix.ColumnCount, 1, 1.0 / (double)matrix.ColumnCount);
         }
 
         /// <summary>
@@ -89,7 +92,7 @@ namespace fFormations
         public bool CheckValidFunction()
         {
             //controllare
-            return ((vector.RowSums()[0] == 1) && (vector.ForAll(x => x >= 0)));
+            return ((vector.ColumnSums()[0] == 1) && (vector.ForAll(x => x >= 0)));
         }
 
         /// <summary>
@@ -135,23 +138,42 @@ namespace fFormations
                 if (!(Math.Abs(vector[i, 0]) <= DeltaZero))
                 {
                     //siamo in presenza di un i buono
-                    int ps = indexes[i];
-                    lp.Add(ps);
+                    //int ps = indexes[i];
+                    lp.Add(i);
                 }
             }
             return lp;
         }
 
-        public virtual void RemoveDominantGroup(List<int> lp)
+        public virtual void RemoveDominantGroup(List<int> lp,List<int> values)
         {
-            foreach (int j in lp)
+
+            indexes.RemoveAll(x => values.Contains(x));
+            List<int> temp = Enumerable.Range(0, matrix.ColumnCount).Except(lp).ToList();
+            if (temp.Count != 0)
             {
-                matrix.RemoveColumn(j);
-                matrix.RemoveRow(j);
-                indexes.RemoveAt(j);
-                vector.RemoveRow(j);
+                matrix = GlobalDominantSet.WeightedAffinity.convertListToMatrix(temp, matrix);
+                ResetVector();
             }
-            ResetVector();
+            /*foreach (int j in lp)
+            {
+                matrix=matrix.RemoveColumn(j);
+                matrix=matrix.RemoveRow(j);
+                vector=vector.RemoveRow(j);
+            }
+
+            Matrix<double> test = Matrix<double>.Build.Dense(matrix.ColumnCount-lp.Count, matrix.ColumnCount - lp.Count);
+            int j = 0;
+            for (int i = 0; i < matrix.ColumnCount; i++)
+                if (!lp.Contains(i))
+                {
+                    test.SetRow(j, matrix.Row(i));
+                    j++;
+                }*/
+
+
+            /*foreach(int value in values)
+                indexes.Remove(value);*/
         }
     }
 
@@ -235,12 +257,18 @@ namespace fFormations
         {
             //WeightedAffinity wa = new WeightedAffinity(matrix);
             List<int> lp = new List<int>(l);
+            if (l.Count == matrix.ColumnCount)
+                return true;
             for (int i = 0; i < matrix.ColumnCount; i++)
             {
-                lp.Add(i);
-                Matrix<double> m = WeightedAffinity.convertListToMatrix(lp, matrix);
-                if (WeightedAffinity.Weight(m, lp.Count - 1) < 0)
-                    return true;
+                if (!lp.Contains(i))
+                {
+                    lp.Add(i);
+                    Matrix<double> m = WeightedAffinity.convertListToMatrix(lp, matrix);
+                    if (WeightedAffinity.Weight(m, lp.Count - 1) < 0)
+                        return true;
+                    lp.Remove(i);
+                }
                 //prova a inserire dentro e calcolare il risultato
                 //se positivo allora ci sta bene!!
             }
@@ -254,6 +282,7 @@ namespace fFormations
             //{
             //this.affinity = affinity.Clone();
             //}
+
             public static Matrix<double> convertListToMatrix(List<int> l, Matrix<double> affinity)
             {
                 Matrix<double> res = Matrix<double>.Build.Dense(l.Count, l.Count);
@@ -269,7 +298,7 @@ namespace fFormations
             //Lista di indice e index è indice nella lista
             public static double WeightedDegree(Matrix<double> res, int index)
             {
-                return (1 / res.ColumnCount) * (res.Row(index).Sum());
+                return (1.0 / res.ColumnCount) * (res.Row(index).Sum());
             }
             /// <summary>
             /// La differenza fra l'affinità di i e S, e l'affinità tra i e J.
@@ -297,7 +326,7 @@ namespace fFormations
                     double sum = 0;
                     for (int c = 0; c < temp.ColumnCount; c++)
                     {
-                        sum = sum + RelativeAffinity(temp, index, v[c, index]) * Weight(temp, c);
+                        sum = sum + RelativeAffinity(temp, c, v[c, index]) * Weight(temp, c);
                     }
                     return sum;
                 }

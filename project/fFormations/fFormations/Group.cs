@@ -41,6 +41,22 @@ namespace fFormations
             Grouping.Add(temp, ls);
             GN++;
         }
+
+        public void addSingleton(int b)
+        {
+            int temp = Grouping.Keys.Count;
+            List<Person> lp = new List<Person>();
+            lp.Add(IdFrame.getPersonById(b));
+            Grouping.Add(temp, lp);
+        }
+
+        public void addAllSingletons(List<int> l)
+        {
+            foreach(int n in l)
+            {
+                addSingleton(n);
+            }
+        }
         //ATTENZIONE 
         /// <summary>
         /// Ordine importante! Il primo parametro è il gruppo stimato,
@@ -80,13 +96,13 @@ namespace fFormations
 
         public override string ToString()
         {
-            string s = "Groups: ";
+            string s = "ID:"+IdFrame.IdFrame+"Groups: ";
             foreach (List<Person> g in Grouping.Values)
             {
                 s = s + "{ ";
                 foreach (Person p in g)
                 {
-                    s = s + p.ID + " ";
+                    s = s + p?.ID + " ";
                 }
                 s = s + "}; ";
             }

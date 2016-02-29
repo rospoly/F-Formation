@@ -22,7 +22,7 @@ namespace fFormations
 
         //Metodi di default offerti dalla nostra classe Affinity//
         public bool ConditionRegularAffinity(double valij) {
-            return (valij <= -Math.PI / 2 && valij >= Math.PI / 2);
+            return ((Math.Abs(valij%(2.0*Math.PI))<= 3.0*Math.PI / 2.0) && ((Math.Abs(valij % (2.0 * Math.PI)) >= Math.PI / 2.0)));
         }
         //Attenzione in questo modo l'affinità fra la stessa persona è negativa.
         public double ComputationRegularAffinity(int i, int j) {
