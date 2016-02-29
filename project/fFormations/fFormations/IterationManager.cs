@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace fFormations
 {
@@ -46,6 +43,10 @@ namespace fFormations
             //ritorno rs
             rs.computation();
             return rs;
+        }
+        static void Main(string[] args)
+        {
+            return;
         }
     }
 }

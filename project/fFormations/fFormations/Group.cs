@@ -31,6 +31,16 @@ namespace fFormations
             Grouping.Add(temp, b);
             GN++;
         }
+
+        public void addSubGroup(List<int> b)
+        {
+            List<Person> ls = new List<Person>();
+            foreach (int p in b)
+                ls.Add(IdFrame.getPersonById(p));
+            int temp = Grouping.Keys.Count;
+            Grouping.Add(temp, ls);
+            GN++;
+        }
         //ATTENZIONE 
         /// <summary>
         /// Ordine importante! Il primo parametro è il gruppo stimato,

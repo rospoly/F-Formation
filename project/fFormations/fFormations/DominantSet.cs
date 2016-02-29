@@ -10,12 +10,17 @@ namespace fFormations
     public abstract class DominantSet : Method
     {
         public Affinity a { get; private set; }
+        public List<int> indexes;
         public Matrix<double> matrix { get; private set; }//matrice di affinità
-        public Vector<double> vector { get; private set; }//vettori per la ricerca dei raggruppamenti
+        public Matrix<double> vector { get; private set; }//vettori per la ricerca dei raggruppamenti
+        /// <summary>
+        /// DeltaZero is the range at witch we consider the value zero.
+        /// </summary>
+        public double DeltaZero;
         //public Frame CopyFrame { get; private set; }
         //public double DeltaValue;
         //Vector rispetta la regola sul label
-        public DominantSet()
+        public DominantSet(double DeltaZero)
         {
 
         }
@@ -24,13 +29,35 @@ namespace fFormations
         {
             this.a = a;
             matrix = a.getCopyMatrix();
+            indexes = a.getCopyIndexes();
             //CopyFrame = a.getCopyFrame();
             ResetVector();
         }
 
         public Group ComputeGroup()
         {
+            ResetVector();
             Group g = new Group(a.F);
+            while (indexes.Count > 0)
+            {
+                while (RecursiveResearchMax() > 0) { };
+                if (CheckValidFunction())
+                {
+                    List<int> temp = FindDominantGroup();
+                    if (StoppingCriterium(temp))
+                    {
+                        //g.addSubGroup(temp);
+                        RemoveDominantGroup(temp);
+                    }
+                    else
+                    {
+                        temp = allSingletons();
+                        RemoveDominantGroup(temp);
+                        //g.addSubGroup(temp);
+                    }
+                    g.addSubGroup(temp);
+                }
+            }
             return g;
         }
 
@@ -40,7 +67,8 @@ namespace fFormations
         /// </summary>
         public void ResetVector()
         {
-            vector = Vector<double>.Build.Dense(matrix.ColumnCount, 1.0 / (double)matrix.ColumnCount);
+            //vettore colonna
+            vector = Matrix<double>.Build.Dense(matrix.ColumnCount, 0, 1.0 / (double)matrix.ColumnCount);
         }
 
         /// <summary>
@@ -51,7 +79,7 @@ namespace fFormations
         /// </returns>
         public double ComputeFunction()
         {
-            return (vector.ToRowMatrix().Multiply(matrix).Multiply(vector)).Single();
+            return (vector.Transpose().Multiply(matrix).Multiply(vector))[0, 0];
         }
 
         /// <summary>
@@ -61,160 +89,172 @@ namespace fFormations
         public bool CheckValidFunction()
         {
             //controllare
-            return ((vector.Sum() == 1) && (vector.ForAll(x => x >= 0)));
+            return ((vector.RowSums()[0] == 1) && (vector.ForAll(x => x >= 0)));
         }
 
         /// <summary>
         /// Compute di replicator dynamics. Used to achieve a local local maximun. 
         /// It compute the replicator function on each element of the vector in order to achieve the maximun.
         /// </summary>
-        public void RecursiveResearchMax()
+        public double RecursiveResearchMax()
         {
-            Vector<double> temp = matrix.Multiply(vector);
+            Matrix<double> temp = matrix.Multiply(vector);
             double val = ComputeFunction();
             //vector.MapIndexed<double>((index, value) => vector[index] = value * temp[index] / val);
-            vector.MapIndexedInplace((index, value) => value * temp[index] / val);
+            vector.MapIndexedInplace((index, colZero, value) => value * temp[index, colZero] / val);
+            return Math.Abs(ComputeFunction() - val);
         }
 
         /// <summary>
         /// When to stop the reaserch of domint set and consider all nodes like singleton.
+        /// It receive the last dominant group computed.
         /// </summary>
         /// <returns></returns>
-        public abstract bool StoppingCriterium();
-
+        public abstract bool StoppingCriterium(List<int> l);
+        public List<int> allSingletons()
+        {
+            /*List<Person> singletons = new List<Person>();
+            foreach (int i in indexes)
+                singletons.Add(a.F.getPersonById(i));
+            */
+            return new List<int>(indexes);
+        }
 
         /// <summary>
         /// What to do when a stationary point is found!
         /// </summary>
         /// <returns></returns>
-        public abstract List<Person> StationaryPointCriterion();
+        //public abstract List<int> FindDominantGroup();
+
+        public virtual List<int> FindDominantGroup()
+        {
+            List<int> lp = new List<int>();
+            int i = 0;
+            for (i = 0; i < vector.RowCount; i++)
+            {
+                if (!(Math.Abs(vector[i, 0]) <= DeltaZero))
+                {
+                    //siamo in presenza di un i buono
+                    int ps = indexes[i];
+                    lp.Add(ps);
+                }
+            }
+            return lp;
+        }
+
+        public virtual void RemoveDominantGroup(List<int> lp)
+        {
+            foreach (int j in lp)
+            {
+                matrix.RemoveColumn(j);
+                matrix.RemoveRow(j);
+                indexes.RemoveAt(j);
+                vector.RemoveRow(j);
+            }
+            ResetVector();
+        }
     }
 
     class LocalDominantSet : DominantSet
     {
-        /// <summary>
-        /// DeltaZero is the range at witch we consider the value zero.
-        /// </summary>
-        double DeltaZero;
+
         /// <summary>
         /// DeltaValue is the range at witch we consider equal two entity.
         /// </summary>
-        double DeltaValue;
-        Frame CopyFrame;
-        LocalDominantSet(double DeltaValue, double DeltaZero)
+        //double DeltaValue;
+        //Frame CopyFrame;
+        public LocalDominantSet(/*double DeltaValue*/ double DeltaZero) : base(DeltaZero)
         {
-            this.DeltaValue = DeltaValue;
-            this.DeltaZero = DeltaZero;
-            CopyFrame = a.F.getCopyFrame();
+            //this.DeltaValue = DeltaValue;
         }
-        public override List<Person> StationaryPointCriterion()
+
+        /*
+        public override List<int> FindDominantGroup()
         {
-            List<Person> lp = new List<Person>();
+            List<int> lp = new List<int>();
             int i = 0;
-            for (i = 0; i < vector.Count; i++)
+            for (i = 0; i < vector.RowCount; i++)
             {
-                if (!(Math.Abs(vector[i]) <= DeltaZero))
+                if (!(Math.Abs(vector[i,0]) <= DeltaZero))
                 {
                     //siamo in presenza di un i buono
-                    Person ps = CopyFrame.getPersonByHelpLabel(i);
+                    int ps = indexes[i];
                     lp.Add(ps);
-                    matrix.RemoveColumn(i);
-                    matrix.RemoveRow(i);
-                    CopyFrame.RemovePerson(ps);
-
                 }
             }
-            ResetVector();
             return lp;
         }
+        */
+
         /// <summary>
         /// True: go on with the research of DominantSet. Else consider the rest all singleton;
         /// </summary>
         /// <returns></returns>
-        public override bool StoppingCriterium()
+        public override bool StoppingCriterium(List<int> l = null)
         {
             return (ComputeFunction() < DeltaZero);
         }
 
-        public List<Person> allSingletons()
-        {
-            List<Person> singletons = new List<Person>();
-            for (int i = 0; i < matrix.ColumnCount; i++)
-            {
-                if (matrix[0, i] != Int16.MinValue)
-                    singletons.Add(a.F.getPersonByHelpLabel(i));
-            }
-            return singletons;
-        }
+
     }
 
     class GlobalDominantSet : DominantSet
     {
-        public double DeltaValue;
-        public double DeltaZero;
-        public GlobalDominantSet(double DeltaValue,double DeltaZero)
+        //public double DeltaValue;
+
+        public GlobalDominantSet(/*double DeltaValue,*/ double DeltaZero) : base(DeltaZero)
         {
-            this.DeltaValue = DeltaValue;
-            this.DeltaZero = DeltaZero;
+            //this.DeltaValue = DeltaValue;
         }
 
-        public override List<Person> StationaryPointCriterion()
+        /*public override List<int> FindDominantGroup()
         {
-            List<Person> lp = new List<Person>();
+            List<int> lp = new List<int>();
             int i = 0;
-            for (i = 0; i < vector.Count; i++)
+            for (i = 0; i < vector.RowCount; i++)
             {
-                if (!(Math.Abs(vector[i]) <= DeltaZero))
+                if (!(Math.Abs(vector[i,0]) <= DeltaZero))
                 {
                     //siamo in presenza di un i buono
-                    lp.Add(a.F.getPersonByHelpLabel(i));
-
-                    //Proviamo, invece di rimuovere i nodi gli assegno un peso pessimo in modo che nessuno
-                    //voglia stare insieme a loro
-                    int var = 0;
-                    for (var = 0; var < matrix.ColumnCount; var++)
-                    {
-                        matrix[i, var] = Int16.MinValue;
-                        matrix[var, i] = Int16.MinValue;
-                    }
+                    //Person ps = a.F.getPersonById(indexes[i]);
+                    lp.Add(i);
+                    //matrix.RemoveColumn(i);
+                    //matrix.RemoveRow(i);
+                    //indexes.RemoveAt(i);
                 }
             }
-            ResetVector();
+            //ResetVector();
             return lp;
-        }
+        }*/
 
-        public override bool StoppingCriterium()
+        /// <summary>
+        /// True: go on with the research of DominantSet. Else consider the rest all singleton;
+        /// </summary>
+        /// <returns></returns>
+        public override bool StoppingCriterium(List<int> l)
         {
-            /* WeightedAffinity wa = new WeightedAffinity(matrix);
-             for (i = 0; i < vector.Count; i++)
-             {
-                 if (!lp.Contains(i))
-                 {
-                     lp.Add(i);
-                     Matrix<double> m = wa.convertListToMatrix(lp);
-                     if (wa.Weight(m, lp.Count - 1))
-                         //prova a inserire dentro e calcolare il risultato
-                         //se positivo allora ci sta bene!!
-                     }
-             }
-             return lp;
-             */
+            //WeightedAffinity wa = new WeightedAffinity(matrix);
+            List<int> lp = new List<int>(l);
+            for (int i = 0; i < matrix.ColumnCount; i++)
+            {
+                lp.Add(i);
+                Matrix<double> m = WeightedAffinity.convertListToMatrix(lp, matrix);
+                if (WeightedAffinity.Weight(m, lp.Count - 1) < 0)
+                    return true;
+                //prova a inserire dentro e calcolare il risultato
+                //se positivo allora ci sta bene!!
+            }
             return false;
         }
 
-        /*public override double StationaryPointCriterion()
-        {
-            return DeltaValue;
-        }*/
-
         public class WeightedAffinity
         {
-            Matrix<double> affinity;
-            public WeightedAffinity(Matrix<double> affinity)
-            {
-                this.affinity = affinity.Clone();
-            }
-            public Matrix<double> convertListToMatrix(List<int> l)
+            //Matrix<double> affinity;
+            //public WeightedAffinity(Matrix<double> affinity)
+            //{
+            //this.affinity = affinity.Clone();
+            //}
+            public static Matrix<double> convertListToMatrix(List<int> l, Matrix<double> affinity)
             {
                 Matrix<double> res = Matrix<double>.Build.Dense(l.Count, l.Count);
                 for (int i = 0; i < res.ColumnCount; i++)
@@ -227,7 +267,7 @@ namespace fFormations
                 return res;
             }
             //Lista di indice e index è indice nella lista
-            public double WeightedDegree(Matrix<double> res, int index)
+            public static double WeightedDegree(Matrix<double> res, int index)
             {
                 return (1 / res.ColumnCount) * (res.Row(index).Sum());
             }
@@ -241,13 +281,13 @@ namespace fFormations
             /// Il peso del collegamento tra i e j
             /// </param>
             /// <returns></returns>
-            public double RelativeAffinity(Matrix<double> res, int index, double aij)
+            public static double RelativeAffinity(Matrix<double> res, int index, double aij)
             {
                 return aij - WeightedDegree(res, index);
             }
 
 
-            public double Weight(Matrix<double> v, int index)
+            public static double Weight(Matrix<double> v, int index)
             {
                 if (v.ColumnCount == 1)
                     return 1;

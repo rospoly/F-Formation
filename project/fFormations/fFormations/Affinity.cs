@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
+using System.Collections;
 
 namespace fFormations
 {
     public abstract class Affinity
     {
+        protected List<int> Indexes { get; set; }
         protected Matrix<double> AdjacencyMatrix { get; set; }
         public Frame F { get; private set; }
-
         public Affinity(Frame f)
         {
             this.F = f;
@@ -37,16 +38,25 @@ namespace fFormations
         //Vengono forniti da affinity dei metodi Regular come supporto
         public void computeAffinity()
         {
-            AdjacencyMatrix = Matrix<double>.Build.Dense(F.N, F.N, HowToCompute);;
+            AdjacencyMatrix = Matrix<double>.Build.Dense(F.N, F.N, HowToCompute);
+            Indexes = new List<int>();
+            for (int i = 0;i<AdjacencyMatrix.ColumnCount; i++)
+                Indexes.Add(F.getPersonByHelpLabel(i).ID);
+            
         }
         
         public int getDimensionAM() {
             return F.N;
         }
-        ///
+
         public Matrix<double> getCopyMatrix() {
             Matrix<double> copy = AdjacencyMatrix.Clone();
             return copy;
+        }
+
+        public List<int> getCopyIndexes()
+        {
+            return new List<int>(Indexes);
         }
 
     }
