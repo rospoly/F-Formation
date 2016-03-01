@@ -156,13 +156,13 @@ namespace fFormations
                 Bg = Matrix<double>.Build.Dense(n, n);
                 for (int i = 0; i < n; i++)
                     for (int j = 0; j < n; j++)
-                        if (i != j) Bg[i, j] = modCut.B[i, j];
+                        if (i != j) Bg[i, j] = modCut.B[members[i], members[j]];
                         else
                         {
                             double sum = 0;
                             foreach (int p in members)
-                                sum = sum + modCut.B[i, p];
-                            Bg[i, j] = modCut.B[i, j] - sum;
+                                sum = sum + modCut.B[members[i], p];
+                            Bg[i, j] = modCut.B[members[i], members[j]] - sum;
                         }
             }
 
