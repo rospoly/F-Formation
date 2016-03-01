@@ -48,11 +48,15 @@ namespace fFormations
             foreach(Frame f in frames)
             {
                 Affinity aff = new Proximity(f);
+           //     Affinity aff = new ProxOrient(f);
                 ModularityCut mc = new ModularityCut();
                 mc.Initialize(aff);
                 Group g = mc.ComputeGroup();
-                Debug.WriteLine("Frame " + f.IdFrame);
+                List<int> res = Group.Compare(g, groups[f.IdFrame-1]);
+                
+                Debug.Write("Frame " + f.IdFrame + ": ");
                 Debug.WriteLine(g);
+                Debug.WriteLine("Correct = " + res[0] + " fp = " + res[1] + " fn = " + res[2]);
             }
             
 

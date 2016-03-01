@@ -146,23 +146,23 @@ namespace fFormations
             {
                 this.members = members;
                 n = members.Length; //elements in THIS split
-                computeGroupModularityMatrix(mc.B);
                 modCut = mc;
+                computeGroupModularityMatrix();
             }
 
             //computes B(g) for the current split
-            private void computeGroupModularityMatrix(Matrix<double> networkB)
+            private void computeGroupModularityMatrix()
             {
                 Bg = Matrix<double>.Build.Dense(n, n);
                 for (int i = 0; i < n; i++)
                     for (int j = 0; j < n; j++)
-                        if (i != j) Bg[i, j] = networkB[i, j];
+                        if (i != j) Bg[i, j] = modCut.B[i, j];
                         else
                         {
                             double sum = 0;
                             foreach (int p in members)
-                                sum = sum + networkB[i, p];
-                            Bg[i, j] = networkB[i, j] - sum;
+                                sum = sum + modCut.B[i, p];
+                            Bg[i, j] = modCut.B[i, j] - sum;
                         }
             }
 
@@ -206,9 +206,13 @@ namespace fFormations
                     else S[i, 1] = 1;
 
                 double deltaQ = (1 / (2 * modCut.m)) * (S.Transpose() * Bg * S).Trace();
-
+                //Debug.WriteLine("DeltaQ = " + deltaQ);
                 if (deltaQ < 0) return true; //modularity decreases, we can split
                 else return false;
+
+                //double Q = (1 / (4 * modCut.m)) * (partitionVector.Transpose() * Bg * partitionVector)[0,0];
+                //if (Q < -0.3) return true;
+                //else return false;
             }
 
             //returns the first eigenvector of the matrix
