@@ -60,23 +60,21 @@ namespace fFormations
       //          Debug.WriteLine("Try to divide " + current);
                 if(current.divide(out res))
                 {
-      //              Debug.Write("Divided: ");
+      //            Debug.Write("Divided: ");
                     groups.Remove(current); //remove current split --> usa equals
-                    if (res.Item1 != null && res.Item1.Length != 0)
+                    if (res.Item1 != null && res.Item1.Length > 1)
                     {
                         Split sub1 = new Split(res.Item1, this);
+    //                  Debug.Write(sub1 + ", ");
                         groups.Add(sub1);
-      //                  Debug.Write(sub1 + ", ");
-                        if(sub1.members.Length != 1) //add to queue if it's not a singleton
-                            q.Enqueue(sub1);
+                        q.Enqueue(sub1);
                     }
-                    if (res.Item2 != null && res.Item2.Length != 0)
+                    if (res.Item2 != null && res.Item2.Length > 1)
                     {
                         Split sub2 = new Split(res.Item2, this);
                         groups.Add(sub2);
-      //                  Debug.WriteLine(sub2);
-                        if(sub2.members.Length != 1) //add to queue if it's not a singleton
-                            q.Enqueue(sub2);
+      //                Debug.WriteLine(sub2);
+                        q.Enqueue(sub2);
                     }
                 }
             }
