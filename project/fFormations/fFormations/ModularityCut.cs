@@ -124,12 +124,7 @@ namespace fFormations
             return m * 0.5;
         }
 
-        //returns network modularity Q when the cut is the partition
-        private double getNetworkModularity(Matrix<double> partition)
-        {
-            double p = (partition.Transpose() * B * partition)[0, 0];
-            return p / (4 * m);
-        }
+        
 
 
 
@@ -169,12 +164,10 @@ namespace fFormations
                 Matrix<double> e = getFirstEigenvector(Bg); //get first eigenvector of modularity matrix of the split
                 Matrix<double> partition = getPartition(e);
 
-                bool splitable = false;
-                for (int i = 1; i < partition.RowCount; i++)
-                    if (partition[0, 0] != partition[i, 0])
-                        splitable = true; //almeno uno è diverso dal primo, se sono tutti uguali resta false
+                if (modCut.KLflag)
+                    partition = KLRefinement(partition); //apply KL refinement
 
-                if (!isSplitable(partition) || !splitable) //if the current split is no further divisible (deltaQ not negative)
+                if (!isSplitable(partition)) //if the current split is no further divisible (deltaQ not negative)
                 {
                     result = null;
                     return false;
@@ -196,6 +189,13 @@ namespace fFormations
             //checks if the proposed split is acceptable
             public bool isSplitable(Matrix<double> partitionVector)
             {
+                bool splitable = false;
+                for (int i = 1; i < partitionVector.RowCount; i++)
+                    if (partitionVector[0, 0] != partitionVector[i, 0])
+                        splitable = true; //almeno uno è diverso dal primo, se sono tutti uguali resta false
+
+                if (!splitable) return false;
+
                 //construct matrix S of 0/1
                 int nSubGroups = 2;
                 Matrix<double> S = Matrix<double>.Build.Dense(n, nSubGroups); // we have c=2 sub-communities
@@ -203,7 +203,7 @@ namespace fFormations
                     if (partitionVector[i, 0] == 1) S[i, 0] = 1;
                     else S[i, 1] = 1;
 
-                double deltaQ = (1 / (2 * modCut.m)) * (S.Transpose() * Bg * S).Trace();
+                double deltaQ =  (S.Transpose() * Bg * S).Trace() / (2 * modCut.m);
                 //Debug.WriteLine("DeltaQ = " + deltaQ);
                 if (deltaQ < 0) return true; //modularity decreases, we can split
                 else return false;
@@ -211,6 +211,43 @@ namespace fFormations
                 //double Q = (1 / (4 * modCut.m)) * (partitionVector.Transpose() * Bg * partitionVector)[0,0];
                 //if (Q < -0.3) return true;
                 //else return false;
+            }
+
+            private Matrix<double> KLRefinement(Matrix<double> partitionVector)
+            {
+                double initialQ = getModularity(partitionVector);
+                int elem = partitionVector.RowCount;
+                Matrix<double> newPartition = partitionVector.Clone();
+            //    List<int> swapped = new List<int>(); //contains already swapped nodes
+                
+          //      while (swapped.Count != elem)
+                
+                newPartition[0, 0] *= -1; //move first element
+                double maxQ = getModularity(newPartition);
+                newPartition[0, 0] *= -1; 
+                int maxi = 0;
+                for (int i = 1; i<elem; i++)
+                {
+                    newPartition[i, 0] *= -1; //move ith element
+                    double thisQ = getModularity(newPartition);
+                    if(Math.Abs(maxQ) < Math.Abs(thisQ)) // ?????????????!!!!!
+                    {
+                        maxQ = thisQ;
+                        maxi = i;
+                    }
+                    newPartition[i, 0] *= -1;
+                }
+                newPartition[maxi, 0] *= -1;
+
+                if (getModularity(newPartition) > getModularity(partitionVector)) return newPartition;
+                else return partitionVector;
+            }
+
+            //returns modularity Q when the cut is partition
+            private double getModularity(Matrix<double> partition)
+            {
+                double p = (partition.Transpose() * Bg * partition)[0, 0];
+                return p / (4 * modCut.m);
             }
 
             //returns the first eigenvector of the matrix
