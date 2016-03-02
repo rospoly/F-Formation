@@ -22,17 +22,17 @@ namespace fFormations
         }
 
         //aggiunto costruttore vuoto, il frame glieli passo uno a uno da iteration manager (Mara)
-        public Affinity()
-        {
-            
-        }
+        public Affinity() { }
 
         //Metodi di default offerti dalla nostra classe Affinity//
-        public bool ConditionRegularAffinity(double valij) {
+        public bool ConditionRegularAffinity(double valij)
+        {
             return ((Math.Abs(valij%(2.0*Math.PI))<= 3.0*Math.PI / 2.0) && ((Math.Abs(valij % (2.0 * Math.PI)) >= Math.PI / 2.0)));
         }
+
         //Attenzione in questo modo l'affinità fra la stessa persona è negativa.
-        public double ComputationRegularAffinity(int i, int j) {
+        public double ComputationRegularAffinity(int i, int j)
+        {
             return -Math.Exp(F.distances[i, j] / 8);
         }
         //////////////////////////////////////////////////////////

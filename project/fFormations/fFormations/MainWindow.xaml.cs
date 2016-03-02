@@ -67,7 +67,8 @@ namespace fFormations
 
             IterationManager im = new IterationManager(dm);
             Method MC = new ModularityCut();
-            Affinity Aff = new Proximity();
+            //  Affinity Aff = new Proximity();
+            Affinity Aff = new ProxOrient();
             im.computeMethod(MC, Aff);
             CollectorResult res = im.comparison();
 
