@@ -78,7 +78,7 @@ namespace fFormations
                 mean[0] += r.precision;
                 mean[1] += r.recall;
                 mean[2] += r.f1;
-                Console.WriteLine(r);
+              //  Debug.WriteLine(r);
             }
 
             mean[0] /= res.l.Count;
