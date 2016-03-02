@@ -13,11 +13,18 @@ namespace fFormations
         protected List<int> Indexes { get; set; }
         protected Matrix<double> AdjacencyMatrix { get; set; }
         public Frame F { get; private set; }
+
         public Affinity(Frame f)
         {
             this.F = f;
             //AdjacencyMatrix = Matrix<double>.Build.Dense(f.N, f.N);
             computeAffinity();
+        }
+
+        //aggiunto costruttore vuoto, il frame glieli passo uno a uno da iteration manager (Mara)
+        public Affinity()
+        {
+            
         }
 
         //Metodi di default offerti dalla nostra classe Affinity//
@@ -38,13 +45,25 @@ namespace fFormations
         //Vengono forniti da affinity dei metodi Regular come supporto
         public void computeAffinity()
         {
+            if (F == null) return; //se non ho settato F dal costruttore devo chiamare l'overload del metodo
             AdjacencyMatrix = Matrix<double>.Build.Dense(F.N, F.N, HowToCompute);
             Indexes = new List<int>();
             for (int i = 0;i<AdjacencyMatrix.ColumnCount; i++)
                 Indexes.Add(F.getPersonByHelpLabel(i).ID);
             
         }
-        
+
+        //calcola la matrice affinità dato un frame (Mara)
+        public void computeAffinity(Frame f)
+        {
+            this.F = f;
+            AdjacencyMatrix = Matrix<double>.Build.Dense(F.N, F.N, HowToCompute);
+            Indexes = new List<int>();
+            for (int i = 0; i < AdjacencyMatrix.ColumnCount; i++)
+                Indexes.Add(F.getPersonByHelpLabel(i).ID);
+
+        }
+
         public int getDimensionAM() {
             return F.N;
         }

@@ -28,7 +28,7 @@ namespace fFormations
         {
             InitializeComponent();
 
-            /* PARSER TEST */
+            /* PARSER TEST 
 
             //get singleton and set paths
             Parser P = Parser.getParser();
@@ -37,13 +37,11 @@ namespace fFormations
             List<Frame> frames = P.readData();
             Debug.WriteLine("Frames correctly read");
             List<Group> groups = P.readGT(frames);
-            Debug.WriteLine("GT correctly read");
+            Debug.WriteLine("GT correctly read"); 
+            */
 
 
-            /* DATA MANAGER */
-           // DataManager dm = new DataManager(dataFile, gtFile);
-
-            /* MODULARITY CUT TEST */
+            /* MODULARITY CUT TEST 
 
             foreach(Frame f in frames)
             {
@@ -58,8 +56,36 @@ namespace fFormations
                 Debug.WriteLine(g);
                 Debug.WriteLine("Correct = " + res[0] + " fp = " + res[1] + " fn = " + res[2]);
             }
-            
+            */
 
+            /* DATA MANAGER */
+
+            DataManager dm = new DataManager(dataFile, gtFile);
+
+
+            /* ITERATION MANAGER TEST */
+
+            IterationManager im = new IterationManager(dm);
+            Method MC = new ModularityCut();
+            Affinity Aff = new Proximity();
+            im.computeMethod(MC, Aff);
+            CollectorResult res = im.comparison();
+
+            double[] mean = new double[3];
+
+            foreach (Result r in res.l)
+            {
+                mean[0] += r.precision;
+                mean[1] += r.recall;
+                mean[2] += r.f1;
+                Console.WriteLine(r);
+            }
+
+            mean[0] /= res.l.Count;
+            mean[1] /= res.l.Count;
+            mean[2] /= res.l.Count;
+
+            Console.WriteLine("Precision = " + mean[0] + ", Recall = " + mean[1] + ", F1 = " + mean[2]);
 
             Console.ReadLine();
         }

@@ -23,7 +23,7 @@ namespace fFormations
         {
             foreach (Frame f in DM.getAllFrames())
             {
-                a.computeAffinity();
+                a.computeAffinity(f); //calcolo affinità su questo frame
                 m.Initialize(a);
                 computed.Add(m.ComputeGroup());
             }
@@ -53,6 +53,7 @@ namespace fFormations
             rs.computation();
             return rs;
         }
+
         static void Main(string[] args) {
             string dataFile = @"input/features.txt";
             string gtFile = @"input/gt.txt";

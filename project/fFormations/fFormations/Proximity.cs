@@ -11,6 +11,8 @@ namespace fFormations
     class Proximity : Affinity
     {
         public Proximity(Frame f) : base(f) {}
+        public Proximity() : base() { } //aggiunto costruttore vuoto
+
         public override double HowToCompute(int i, int j)
         {
             return ComputationRegularAffinity(i, j);
