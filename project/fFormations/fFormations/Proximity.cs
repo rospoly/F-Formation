@@ -10,9 +10,8 @@ namespace fFormations
 {
     class Proximity : Affinity
     {
-        public Proximity(Frame f) : base(f) {}
-        public Proximity() : base() { } //aggiunto costruttore vuoto
-
+        //public Proximity(Frame f) : base(f) {}
+        //public Proximity() : base() { } //aggiunto costruttore vuoto
         public override double HowToCompute(int i, int j)
         {
             return ComputationRegularAffinity(i, j);
@@ -20,24 +19,31 @@ namespace fFormations
     }
     class ProxOrient : Affinity
     {
-        Vector vector1 = new Vector();
-        Vector vector2 = new Vector();
+        Vector vector1;
+        Vector vector2;
         double angleij;
         double angleji;
         double valij;
         double valji;
 
-        public ProxOrient(Frame f) : base(f) {
+        /*public ProxOrient(Frame f) : base(f) {
              vector1 = new Vector();
              vector2 = new Vector();
              angleij = 0;
              angleji = 0;
              valij = 0;
              valji = 0;
-        }
+        }*/
 
         //costruttore vuoto
-        public ProxOrient() : base() { }
+        public ProxOrient() : base() {
+            vector1 = new Vector();
+            vector2 = new Vector();
+            angleij = 0;
+            angleji = 0;
+            valij = 0;
+            valji = 0;
+        }
 
         public void InitVectors(int i, int j) {
             //inizializzo i vettori
@@ -79,7 +85,7 @@ namespace fFormations
         public Vector<double> pf;//smefo values 
         public Vector<double> centers;//centers of focus
 
-        public SMEFO(Frame f) : base(f)
+        public SMEFO(Frame f) //: base(f)
         {
              pf = Vector<double>.Build.Dense(f.N); 
              centers = Vector<double>.Build.Dense(f.N);

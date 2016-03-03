@@ -86,11 +86,13 @@ namespace fFormations
 
         public static bool operator ==(Frame a, Frame b)
         {
-            return a.IdFrame == b.IdFrame;
+            if (a!= null)
+                return a?.IdFrame == b?.IdFrame;
+            return false;
         }
         public static bool operator !=(Frame a, Frame b)
         {
-            return a.IdFrame != b.IdFrame;
+            return !(a==b);
         }
 
         public override bool Equals(object obj)
