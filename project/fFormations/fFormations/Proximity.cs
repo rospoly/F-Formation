@@ -50,15 +50,13 @@ namespace fFormations
             InitVectors(i, j);
             //In questo caso mi serve l'angolo della prima persona e quello della seconda
             valij = GetMeasure(i) - angleij;
-            valji = GetMeasure(j) - angleji;
+            valji = GetMeasure(i) - angleji;
             //Secondo me la ComputationRegularAffinity(i,j)=ComputationRegularAffinity(j,i)
             //Se entrambe le condizioni sono verificate, devo calcolare il valore
             //Se una delle due condizioni è falsa prendo 0, siccome la computazione
             //coinvolge un'esponenziale allora 0 è sicuramente minore.
             if (ConditionRegularAffinity(valij) && ConditionRegularAffinity(valji))
             {
-                if (ComputationRegularAffinity(i, j) != ComputationRegularAffinity(j, i))
-                    Console.WriteLine();
                 return ComputationRegularAffinity(i, j);
             }
             return 0;
