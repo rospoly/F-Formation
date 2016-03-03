@@ -8,14 +8,23 @@ namespace fFormations
 {
     class Result
     {
-        double precision, recall, f1;
+        public double precision { get; set; }
+        public double recall { get; set; }
+        public double f1 { get; set; }
         int refIDFrame;
-        public Result(List<int> temp, int IdFrame = -1) {
+
+        public Result(List<int> temp, int IdFrame = -1)
+        {
             refIDFrame = IdFrame;
-            precision = temp[0] / (double)(temp[0] + temp[1]);
-            recall=temp[0]/(double)(temp[0]+temp[2]);
+            precision = temp[0] / (double)(temp[0] + temp[1]); //precision = tp / (tp + fp)
+            if (double.IsNaN(precision)) precision = 1;
+
+            recall=temp[0]/(double)(temp[0]+temp[2]); //recall = tp / (tp + fn)
+            if (double.IsNaN(recall)) recall = 1;
+
             f1 = (2*precision* recall) / (precision+recall);
         }
+
         public override string ToString()
         {
             String s = (refIDFrame == -1 ? "Resoconto: \n" : "IdFrame: " + refIDFrame+"\n");
@@ -23,7 +32,9 @@ namespace fFormations
             return s;
         }
     }
-    class CollectorResult {
+
+    class CollectorResult
+    {
         public List<Result> l;
         public CollectorResult()
         {

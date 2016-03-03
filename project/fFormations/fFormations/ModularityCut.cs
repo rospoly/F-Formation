@@ -5,14 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Factorization;
+using System.Diagnostics;
 
 namespace fFormations
 {
     public class ModularityCut : Method
     {
-        protected Affinity affinity; //affinity matrix
+        private Affinity affinity; //affinity matrix
         
-        private int N; //elements
+        private int N; //network elements
         private double m; //normalization term
         private bool KLflag = false;
         private Matrix<double> B; //modularity matrix for entire network
@@ -28,17 +29,19 @@ namespace fFormations
         public void Initialize(Affinity a)
         {
             affinity = a;
-            A = affinity.getCopyMatrix();
+            A = affinity.getCopyMatrix(); //affinity matrix
             N = affinity.getDimensionAM();
 
-            List<int> elementsID = new List<int>(); //contains all helplabels
+           // List<int> elementsID = new List<int>(); //contains all helplabels
+            int[] labels = new int[N];
             for (int i = 0; i < N; i++)
-                elementsID.Add(a.F.Persons[i].HelpLabel);
+                labels[i] = a.F.Persons[i].HelpLabel;
+               // elementsID.Add(a.F.Persons[i].HelpLabel);
 
             computeNormTerm();
             computeModularityMatrix();
 
-            firstSplit = new Split(elementsID, this); //the first split contains all elements
+            firstSplit = new Split(labels, this); //the first split contains all elements
         }
 
         public Group ComputeGroup()
@@ -52,21 +55,25 @@ namespace fFormations
 
             while (q.Count != 0)
             {
-                Tuple<List<int>, List<int>> res;
+                Tuple<int[], int[]> res;
                 Split current = q.Dequeue();
+      //          Debug.WriteLine("Try to divide " + current);
                 if(current.divide(out res))
                 {
+      //            Debug.Write("Divided: ");
                     groups.Remove(current); //remove current split --> usa equals
-                    if (res.Item1 != null && res.Item1.Count != 0)
+                    if (res.Item1 != null && res.Item1.Length > 1)
                     {
                         Split sub1 = new Split(res.Item1, this);
+    //                  Debug.Write(sub1 + ", ");
                         groups.Add(sub1);
                         q.Enqueue(sub1);
                     }
-                    if (res.Item2 != null && res.Item2.Count != 0)
+                    if (res.Item2 != null && res.Item2.Length > 1)
                     {
                         Split sub2 = new Split(res.Item2, this);
                         groups.Add(sub2);
+      //                Debug.WriteLine(sub2);
                         q.Enqueue(sub2);
                     }
                 }
@@ -117,52 +124,50 @@ namespace fFormations
             return m * 0.5;
         }
 
-        //returns network modularity Q when the cut is the partition
-        private double getNetworkModularity(Matrix<double> partition)
-        {
-            double p = (partition.Transpose() * B * partition)[0, 0];
-            return p / (4 * m);
-        }
+        
 
 
 
         class Split: IEquatable<Split>
         {
             private ModularityCut modCut; //parent modularity cut object
-            public List<int> members = new List<int>();
+            public int[] members;
             public Matrix<double> Bg; //mod matrix of the current subgraph
             private int n;
 
-            public Split(List<int> members, ModularityCut mc)
+            public Split(int[] members, ModularityCut mc)
             {
                 this.members = members;
-                n = members.Count; //elements in THIS split
-                computeGroupModularityMatrix(mc.B);
+                n = members.Length; //elements in THIS split
                 modCut = mc;
+                computeGroupModularityMatrix();
             }
 
             //computes B(g) for the current split
-            private void computeGroupModularityMatrix(Matrix<double> networkB)
+            private void computeGroupModularityMatrix()
             {
                 Bg = Matrix<double>.Build.Dense(n, n);
                 for (int i = 0; i < n; i++)
                     for (int j = 0; j < n; j++)
-                        if (i != j) Bg[i, j] = networkB[i, j];
+                        if (i != j) Bg[i, j] = modCut.B[members[i], members[j]];
                         else
                         {
                             double sum = 0;
                             foreach (int p in members)
-                                sum = sum + networkB[i, p];
-                            Bg[i, j] = networkB[i, j] - sum;
+                                sum = sum + modCut.B[members[i], p];
+                            Bg[i, j] = modCut.B[members[i], members[j]] - sum;
                         }
             }
 
-            public bool divide(out Tuple<List<int>, List<int>> result)
+            public bool divide(out Tuple<int[], int[]> result)
             {
                 Matrix<double> e = getFirstEigenvector(Bg); //get first eigenvector of modularity matrix of the split
                 Matrix<double> partition = getPartition(e);
 
-                if (!isSplitable(partition) || members.Count <= 1) //if the current split is no further divisible (deltaQ not negative)
+                if (modCut.KLflag)
+                    partition = KLRefinement(partition); //apply KL refinement
+
+                if (!isSplitable(partition)) //if the current split is no further divisible (deltaQ not negative)
                 {
                     result = null;
                     return false;
@@ -177,24 +182,72 @@ namespace fFormations
                     else group2.Add(members[i]);
                 }
 
-                result = new Tuple<List<int>, List<int>>(group1, group2);
+                result = new Tuple<int[], int[]>(group1.ToArray(), group2.ToArray());
                 return true;
             }
 
             //checks if the proposed split is acceptable
             public bool isSplitable(Matrix<double> partitionVector)
             {
+                bool splitable = false;
+                for (int i = 1; i < partitionVector.RowCount; i++)
+                    if (partitionVector[0, 0] != partitionVector[i, 0])
+                        splitable = true; //almeno uno è diverso dal primo, se sono tutti uguali resta false
+
+                if (!splitable) return false;
+
                 //construct matrix S of 0/1
                 int nSubGroups = 2;
-                Matrix<double> S = Matrix<double>.Build.Dense(n, nSubGroups); // we have 2 sub-communities
+                Matrix<double> S = Matrix<double>.Build.Dense(n, nSubGroups); // we have c=2 sub-communities
                 for (int i = 0; i < n; i++)
                     if (partitionVector[i, 0] == 1) S[i, 0] = 1;
                     else S[i, 1] = 1;
 
-                double deltaQ = (1 / (2 * modCut.m)) * (S.Transpose() * Bg * S).Trace();
-
+                double deltaQ =  (S.Transpose() * Bg * S).Trace() / (2 * modCut.m);
+                //Debug.WriteLine("DeltaQ = " + deltaQ);
                 if (deltaQ < 0) return true; //modularity decreases, we can split
                 else return false;
+
+                //double Q = (1 / (4 * modCut.m)) * (partitionVector.Transpose() * Bg * partitionVector)[0,0];
+                //if (Q < -0.3) return true;
+                //else return false;
+            }
+
+            private Matrix<double> KLRefinement(Matrix<double> partitionVector)
+            {
+                double initialQ = getModularity(partitionVector);
+                int elem = partitionVector.RowCount;
+                Matrix<double> newPartition = partitionVector.Clone();
+            //    List<int> swapped = new List<int>(); //contains already swapped nodes
+                
+          //      while (swapped.Count != elem)
+                
+                newPartition[0, 0] *= -1; //move first element
+                double maxQ = getModularity(newPartition);
+                newPartition[0, 0] *= -1; 
+                int maxi = 0;
+                for (int i = 1; i<elem; i++)
+                {
+                    newPartition[i, 0] *= -1; //move ith element
+                    double thisQ = getModularity(newPartition);
+                    if(Math.Abs(maxQ) < Math.Abs(thisQ)) // ?????????????!!!!!
+                    {
+                        maxQ = thisQ;
+                        maxi = i;
+                    }
+                    newPartition[i, 0] *= -1;
+                }
+                newPartition[maxi, 0] *= -1;
+
+                if (getModularity(newPartition) > getModularity(partitionVector)) return newPartition;
+                else return partitionVector;
+            }
+
+            //returns modularity Q when the cut is partition
+            private double getModularity(Matrix<double> partition)
+            {
+                double p = (partition.Transpose() * Bg * partition)[0, 0];
+                return p / (4 * modCut.m);
             }
 
             //returns the first eigenvector of the matrix

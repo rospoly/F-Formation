@@ -96,7 +96,7 @@ namespace fFormations
 
         public override string ToString()
         {
-            string s = "ID:"+IdFrame.IdFrame+"Groups: ";
+            string s = "ID: " + IdFrame.IdFrame + ", Groups: ";
             foreach (List<Person> g in Grouping.Values)
             {
                 s = s + "{ ";
