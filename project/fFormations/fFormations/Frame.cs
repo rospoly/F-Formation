@@ -92,7 +92,9 @@ namespace fFormations
         }
         public static bool operator !=(Frame a, Frame b)
         {
-            return !(a==b);
+            if (a != null && b!=null)
+                return a?.IdFrame != b?.IdFrame;
+            return false;
         }
 
         public override bool Equals(object obj)
