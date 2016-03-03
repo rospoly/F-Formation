@@ -68,7 +68,7 @@ namespace fFormations
         /// <param name="error"></param>
         /// <returns></returns>
         public static List<int> Compare(Group val, Group orig,double error=1) {
-            if (val.IdFrame != orig.IdFrame) return new List<int>();//Non sto confrontando gli stessi frame
+            if (val.IdFrame.IdFrame != orig.IdFrame.IdFrame) return new List<int>();//Non sto confrontando gli stessi frame
             int correct = 0;
             int falsePositive = 0;
             int falseNegative = 0;
