@@ -14,15 +14,21 @@ namespace fFormations
         public Matrix<double> matrix { get; private set; }//matrice di affinità
         public Matrix<double> vector { get; private set; }//vettori per la ricerca dei raggruppamenti
         /// <summary>
-        /// DeltaZero is the range at witch we consider the value zero.
+        /// DeltaZero is the limit at witch we consider the value zero.
         /// </summary>
         public double DeltaZero;
+        /// <summary>
+        /// DeltaValue is the limit at witch the function f reach a local maximun
+        /// </summary>
+        public double DeltaValue;
         //public Frame CopyFrame { get; private set; }
         //public double DeltaValue;
         //Vector rispetta la regola sul label
-        public DominantSet(double DeltaZero)
+        public DominantSet(double DeltaZero,double DeltaValue)
         {
             this.DeltaZero = DeltaZero;
+            this.DeltaValue = DeltaValue;
+
         }
 
         public void Initialize(Affinity a)
@@ -40,13 +46,13 @@ namespace fFormations
             Group g = new Group(a.F);
             while (indexes.Count > 0)
             {
-                while (RecursiveResearchMax() > 0) { };
+                while (RecursiveResearchMax() > DeltaValue) { };
                 if (CheckValidFunction())
                 {
                     List<int> temp = FindDominantGroup();
-                    if (!StoppingCriterium(temp))
+                    if (StoppingCriterium(temp))
                     {
-                        g.addAllSingletons(allSingletons());
+                        //g.addAllSingletons(allSingletons());
                         indexes.Clear();
                     }
                     else
@@ -59,6 +65,10 @@ namespace fFormations
                         g.addSubGroup(pers);
                         RemoveDominantGroup(temp, pers);
                     }
+                }
+                else
+                {
+                    Console.WriteLine("SolutionNotCorrect");
                 }
             }
             return g;
@@ -92,7 +102,7 @@ namespace fFormations
         public bool CheckValidFunction()
         {
             //controllare
-            return ((vector.ColumnSums()[0] == 1) && (vector.ForAll(x => x >= 0)));
+            return ((vector.ColumnSums()[0] >=1-DeltaValue) && (vector.ForAll(x => x >= 0)));
         }
 
         /// <summary>
@@ -104,8 +114,12 @@ namespace fFormations
             Matrix<double> temp = matrix.Multiply(vector);
             double val = ComputeFunction();
             //vector.MapIndexed<double>((index, value) => vector[index] = value * temp[index] / val);
-            vector.MapIndexedInplace((index, colZero, value) => value * temp[index, colZero] / val);
-            return Math.Abs(ComputeFunction() - val);
+            if (val != 0)
+            {
+                vector.MapIndexedInplace((index, colZero, value) => value * temp[index, colZero] / val, Zeros.Include);
+                return Math.Abs(ComputeFunction() - val);
+            }
+            return 0;
         }
 
         /// <summary>
@@ -185,36 +199,18 @@ namespace fFormations
         /// </summary>
         //double DeltaValue;
         //Frame CopyFrame;
-        public LocalDominantSet(/*double DeltaValue*/ double DeltaZero) : base(DeltaZero)
+        public LocalDominantSet(double DeltaZero, double DeltaValue) : base(DeltaZero,DeltaValue)
         {
             //this.DeltaValue = DeltaValue;
         }
 
-        /*
-        public override List<int> FindDominantGroup()
-        {
-            List<int> lp = new List<int>();
-            int i = 0;
-            for (i = 0; i < vector.RowCount; i++)
-            {
-                if (!(Math.Abs(vector[i,0]) <= DeltaZero))
-                {
-                    //siamo in presenza di un i buono
-                    int ps = indexes[i];
-                    lp.Add(ps);
-                }
-            }
-            return lp;
-        }
-        */
-
         /// <summary>
-        /// True: go on with the research of DominantSet. Else consider the rest all singleton;
+        /// false: go on with the research of DominantSet. Else consider the rest all singleton;
         /// </summary>
         /// <returns></returns>
         public override bool StoppingCriterium(List<int> l = null)
         {
-            return (ComputeFunction() < DeltaZero);
+            return Math.Abs(ComputeFunction()) < DeltaZero;
         }
 
 
@@ -224,33 +220,10 @@ namespace fFormations
     {
         //public double DeltaValue;
 
-        public GlobalDominantSet(/*double DeltaValue,*/ double DeltaZero) : base(DeltaZero)
-        {
-            //this.DeltaValue = DeltaValue;
-        }
-
-        /*public override List<int> FindDominantGroup()
-        {
-            List<int> lp = new List<int>();
-            int i = 0;
-            for (i = 0; i < vector.RowCount; i++)
-            {
-                if (!(Math.Abs(vector[i,0]) <= DeltaZero))
-                {
-                    //siamo in presenza di un i buono
-                    //Person ps = a.F.getPersonById(indexes[i]);
-                    lp.Add(i);
-                    //matrix.RemoveColumn(i);
-                    //matrix.RemoveRow(i);
-                    //indexes.RemoveAt(i);
-                }
-            }
-            //ResetVector();
-            return lp;
-        }*/
+        public GlobalDominantSet(double DeltaZero, double DeltaValue) : base(DeltaZero,DeltaValue){}
 
         /// <summary>
-        /// True: go on with the research of DominantSet. Else consider the rest all singleton;
+        /// false: go on with the research of DominantSet. Else consider the rest all singleton;
         /// </summary>
         /// <returns></returns>
         public override bool StoppingCriterium(List<int> l)
@@ -266,13 +239,13 @@ namespace fFormations
                     lp.Add(i);
                     Matrix<double> m = WeightedAffinity.convertListToMatrix(lp, matrix);
                     if (WeightedAffinity.Weight(m, lp.Count - 1) < 0)
-                        return true;
+                        return false;
                     lp.Remove(i);
                 }
                 //prova a inserire dentro e calcolare il risultato
                 //se positivo allora ci sta bene!!
             }
-            return false;
+            return true;
         }
 
         public class WeightedAffinity
@@ -314,7 +287,6 @@ namespace fFormations
             {
                 return aij - WeightedDegree(res, index);
             }
-
 
             public static double Weight(Matrix<double> v, int index)
             {
