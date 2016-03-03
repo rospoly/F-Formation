@@ -67,26 +67,12 @@ namespace fFormations
 
             IterationManager im = new IterationManager(dm);
             Method MC = new ModularityCut();
-            //  Affinity Aff = new Proximity();
+         //   Affinity Aff = new Proximity();
             Affinity Aff = new ProxOrient();
             im.computeMethod(MC, Aff);
             CollectorResult res = im.comparison();
 
-            double[] mean = new double[3];
-
-            foreach (Result r in res.l)
-            {
-                mean[0] += r.precision;
-                mean[1] += r.recall;
-                mean[2] += r.f1;
-              //  Debug.WriteLine(r);
-            }
-
-            mean[0] /= res.l.Count;
-            mean[1] /= res.l.Count;
-            mean[2] /= res.l.Count;
-
-            Console.WriteLine("Precision = " + mean[0] + ", Recall = " + mean[1] + ", F1 = " + mean[2]);
+            Console.WriteLine(res);
 
             Console.ReadLine();
         }

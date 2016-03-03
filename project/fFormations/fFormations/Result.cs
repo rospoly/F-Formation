@@ -13,7 +13,7 @@ namespace fFormations
         public double f1 { get; set; }
         int refIDFrame;
 
-        public Result(List<int> temp, int IdFrame = -1)
+        public Result(List<int> temp, int IdFrame)
         {
             refIDFrame = IdFrame;
             precision = temp[0] / (double)(temp[0] + temp[1]); //precision = tp / (tp + fp)
@@ -27,15 +27,17 @@ namespace fFormations
 
         public override string ToString()
         {
-            String s = (refIDFrame == -1 ? "Resoconto: \n" : "IdFrame: " + refIDFrame+"\n");
-            s = s + "precision: "+precision+"; Recall: "+recall+"; f1: "+f1+";\n";
-            return s;
+            return "Result: Id = " + refIDFrame + ", prec = " + precision + ", Rec = " + recall + ", f1 = " + f1;
         }
     }
 
     class CollectorResult
     {
         public List<Result> l;
+        public double precisionMean { get; set; }
+        public double recallMean { get; set; }
+        public double fMean { get; set; }
+
         public CollectorResult()
         {
             l = new List<Result>();
@@ -45,15 +47,30 @@ namespace fFormations
             l.Add(r);
         }
 
-        public void computation() {
+        public void computeMeans()
+        {
+            foreach(Result r in l)
+            {
+                precisionMean += r.precision;
+                recallMean += r.recall;
+                fMean += r.f1;
+            }
+            precisionMean /= l.Count;
+            recallMean /= l.Count;
+            fMean /= l.Count;
+        }
+
+        public string getAllResultsStrings()
+        {
+            string s = "";
+            foreach (Result r in l)
+                s = s + r.ToString() + "\n";
+            return s;
         }
 
         public override string ToString()
         {
-            foreach (Result r in l) {
-                return r.ToString();
-            }
-            return "";
+            return "CollectorResult: precision = " + precisionMean + ", recall = " + recallMean + ", fmeasure = " + fMean;
         }
     }
 }

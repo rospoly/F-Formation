@@ -72,8 +72,10 @@ namespace fFormations
             int correct = 0;
             int falsePositive = 0;
             int falseNegative = 0;
-            foreach (List<Person> l1 in val.Grouping.Values) {
-                foreach (List<Person> l2 in orig.Grouping.Values)
+
+            foreach (List<Person> l1 in val.Grouping.Values) //foreach detected group
+            {
+                foreach (List<Person> l2 in orig.Grouping.Values) //foreach gt group
                 {
                     IEnumerable<Person> temp = l1.Intersect<Person>(l2,new PersonComparator());
                     if (l1.Count == 2 && l2.Count == 2 && temp.Count<Person>()==2)

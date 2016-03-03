@@ -101,7 +101,8 @@ namespace fFormations
             for (int i = 0; i < N; i++)
                 for(int j = 0; j < N; j++)
                 {
-                    B[i, j] = A[i, j] - ((expectedDegree(i) * expectedDegree(j)) / (2 * m));
+                    if (m == 0) B[i, j] = 0;
+                    else B[i, j] = A[i, j] - ((expectedDegree(i) * expectedDegree(j)) / (2 * m));
                 }
         }
 
