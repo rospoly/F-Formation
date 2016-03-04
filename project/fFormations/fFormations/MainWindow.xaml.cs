@@ -76,36 +76,41 @@ namespace fFormations
 
             Console.ReadLine();
             */
-            //////////////////Rocco////////////////
 
+
+
+            ////////////////////////////////////////
+            //////////////////Rocco////////////////
+            ///////////////////////////////////////
             
             string dataFile = @"input/features.txt";
             string gtFile = @"input/gt.txt";
             DataManager dm = new DataManager(dataFile, gtFile);
+
+            /*
             foreach (Frame frame in dm.getAllFrames())
             {
                 Affinity a = new Proximity(frame);
-                Method m = new LocalDominantSet(1E-3, 1E-6);
+                Method m = new ModularityCut();
+                //Method m = new LocalDominantSet(1E-3, 1E-4);
                 //GlobalDominantSet(1E-10);
                 m.Initialize(a);
                 Group my = m.ComputeGroup();
-                Result t = new Result(Group.Compare(my, dm.getGTById(frame.IdFrame)), frame.IdFrame);
+                Result t = Group.Compare(my, dm.getGTById(frame.IdFrame),2.0/3.0);
                 Console.WriteLine(t);
                 Console.WriteLine(my);
                 Console.WriteLine(dm.getGTById(frame.IdFrame));
                 Console.ReadLine();
             }
-            /*
+            */
             IterationManager im = new IterationManager(dm);
-            Method m = new LocalDominantSet(1E-3, 1E-6);
+            Method m = new ModularityCut();
+            //Method m = new LocalDominantSet(1E-1, 1E-2);
             Affinity Aff = new Proximity();
             im.computeMethod(m, Aff);
             CollectorResult res = im.comparison();
             Console.WriteLine(res);
-            Console.WriteLine(res);
-
             Console.ReadLine();
-            */        
         }
     }
 }

@@ -14,7 +14,7 @@ namespace fFormations
         protected Matrix<double> AdjacencyMatrix { get; set; }
         public Frame F { get; private set; }
         private double scalarFactor = 2.0;
- 
+        
         public Affinity(Frame f)
         {
             this.F = f;
