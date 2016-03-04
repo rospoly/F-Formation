@@ -60,21 +60,52 @@ namespace fFormations
 
             /* DATA MANAGER */
 
-            DataManager dm = new DataManager(dataFile, gtFile);
+            //DataManager dm = new DataManager(dataFile, gtFile);
 
 
-            /* ITERATION MANAGER TEST */
+            /* ITERATION MANAGER TEST 
 
             IterationManager im = new IterationManager(dm);
             Method MC = new ModularityCut();
             Affinity Aff = new Proximity();
-         //   Affinity Aff = new ProxOrient();
+            //Affinity Aff = new ProxOrient();
             im.computeMethod(MC, Aff);
             CollectorResult res = im.comparison();
 
             Console.WriteLine(res);
 
             Console.ReadLine();
+            */
+            //////////////////Rocco////////////////
+
+            
+            string dataFile = @"input/features.txt";
+            string gtFile = @"input/gt.txt";
+            DataManager dm = new DataManager(dataFile, gtFile);
+            foreach (Frame frame in dm.getAllFrames())
+            {
+                Affinity a = new Proximity(frame);
+                Method m = new LocalDominantSet(1E-3, 1E-6);
+                //GlobalDominantSet(1E-10);
+                m.Initialize(a);
+                Group my = m.ComputeGroup();
+                Result t = new Result(Group.Compare(my, dm.getGTById(frame.IdFrame)), frame.IdFrame);
+                Console.WriteLine(t);
+                Console.WriteLine(my);
+                Console.WriteLine(dm.getGTById(frame.IdFrame));
+                Console.ReadLine();
+            }
+            /*
+            IterationManager im = new IterationManager(dm);
+            Method m = new LocalDominantSet(1E-3, 1E-6);
+            Affinity Aff = new Proximity();
+            im.computeMethod(m, Aff);
+            CollectorResult res = im.comparison();
+            Console.WriteLine(res);
+            Console.WriteLine(res);
+
+            Console.ReadLine();
+            */        
         }
     }
 }

@@ -29,3 +29,4 @@ C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fForm
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\fFormations.csproj.GenerateResource.Cache
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\fFormations.exe
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\fFormations.pdb
+C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\fFormations.csprojResolveAssemblyReference.cache

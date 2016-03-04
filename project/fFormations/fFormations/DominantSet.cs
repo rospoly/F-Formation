@@ -50,7 +50,7 @@ namespace fFormations
                 if (CheckValidFunction())
                 {
                     List<int> temp = FindDominantGroup();
-                    if (StoppingCriterium(temp))
+                    if (StoppingCriterium(temp) || indexes.Count==1)
                     {
                         //g.addAllSingletons(allSingletons());
                         indexes.Clear();

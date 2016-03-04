@@ -10,8 +10,8 @@ namespace fFormations
 {
     class Proximity : Affinity
     {
-        //public Proximity(Frame f) : base(f) {}
-        //public Proximity() : base() { } //aggiunto costruttore vuoto
+        public Proximity(Frame f) : base(f) {}
+        public Proximity() : base() { } //aggiunto costruttore vuoto
         public override double HowToCompute(int i, int j)
         {
             return ComputationRegularAffinity(i, j);
@@ -26,14 +26,14 @@ namespace fFormations
         double valij;
         double valji;
 
-        /*public ProxOrient(Frame f) : base(f) {
+        public ProxOrient(Frame f) : base(f) {
              vector1 = new Vector();
              vector2 = new Vector();
              angleij = 0;
              angleji = 0;
              valij = 0;
              valji = 0;
-        }*/
+        }
 
         //costruttore vuoto
         public ProxOrient() : base() {

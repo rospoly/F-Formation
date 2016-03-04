@@ -44,26 +44,6 @@ namespace fFormations
             }
         }
 
-        /// <summary>
-        /// Correct the help label of the Person in the frame after the
-        /// elimination of one of them
-        /// </summary>
-        /// <param name="p"></param>
-        /*public void CorrectHelpLabel(Person p){
-            for (int i=p.HelpLabel;i< N; i++)
-            {
-                Persons[i].HelpLabel
-            }
-        }*/
-
-        /*public void RemovePerson(Person p) {
-            Persons.Remove(p);
-            this.N = Persons.Count;
-            distances.RemoveColumn(p.HelpLabel);
-            distances.RemoveRow(p.HelpLabel);
-            ReassignHelpLabel();
-        }*/
-
         public Frame getCopyFrame()
         {
             return FactoryFrame.createFrame(IdFrame, new List<Person>(Persons));
@@ -86,15 +66,11 @@ namespace fFormations
 
         public static bool operator ==(Frame a, Frame b)
         {
-            if (a!= null)
-                return a?.IdFrame == b?.IdFrame;
-            return false;
+            return a?.IdFrame == b?.IdFrame;
         }
         public static bool operator !=(Frame a, Frame b)
         {
-            if (a != null && b!=null)
-                return a?.IdFrame != b?.IdFrame;
-            return false;
+            return a?.IdFrame != b?.IdFrame;
         }
 
         public override bool Equals(object obj)
