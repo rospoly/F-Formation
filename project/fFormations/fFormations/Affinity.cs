@@ -13,7 +13,7 @@ namespace fFormations
         protected List<int> Indexes { get; set; }
         protected Matrix<double> AdjacencyMatrix { get; set; }
         public Frame F { get; private set; }
-        private double scalarFactor = 2.0;
+        private double scalarFactor = 200; //sigma = 200 cm
         
         public Affinity(Frame f)
         {
@@ -35,7 +35,7 @@ namespace fFormations
         //Attenzione in questo modo l'affinità fra la stessa persona è negativa.
         public double ComputationRegularAffinity(int i, int j)
         {
-            return -Math.Exp(F.distances[i, j] / (2.0*scalarFactor*scalarFactor));
+            return Math.Exp(-1 * (F.distances[i, j] / (2 * scalarFactor * scalarFactor)));
         }
         //////////////////////////////////////////////////////////
 

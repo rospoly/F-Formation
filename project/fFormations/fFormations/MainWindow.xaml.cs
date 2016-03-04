@@ -103,9 +103,10 @@ namespace fFormations
                 Console.ReadLine();
             }
             */
+
             IterationManager im = new IterationManager(dm);
-            Method m = new ModularityCut();
-            //Method m = new LocalDominantSet(1E-1, 1E-2);
+          //  Method m = new ModularityCut();
+            Method m = new LocalDominantSet(1E-1, 1E-2);
             Affinity Aff = new Proximity();
             im.computeMethod(m, Aff);
             CollectorResult res = im.comparison();
