@@ -127,8 +127,6 @@ namespace fFormations
 
         
 
-
-
         class Split: IEquatable<Split>
         {
             private ModularityCut modCut; //parent modularity cut object
@@ -219,9 +217,6 @@ namespace fFormations
                 double initialQ = getModularity(partitionVector);
                 int elem = partitionVector.RowCount;
                 Matrix<double> newPartition = partitionVector.Clone();
-            //    List<int> swapped = new List<int>(); //contains already swapped nodes
-                
-          //      while (swapped.Count != elem)
                 
                 newPartition[0, 0] *= -1; //move first element
                 double maxQ = getModularity(newPartition);
@@ -256,7 +251,8 @@ namespace fFormations
             {
                 Evd<double> eigen = matrix.Evd();
                 Matrix<double> vectors = eigen.EigenVectors;
-                return vectors.SubMatrix(0, vectors.RowCount, vectors.ColumnCount-1, 1); //returns only 1st vector
+             //   return vectors.SubMatrix(0, vectors.RowCount, vectors.ColumnCount-1, 1); //returns only 1st vector
+                return vectors.SubMatrix(0, vectors.RowCount, 0, 1);
             }
 
             //returns 1 and -1 vector
