@@ -7,9 +7,9 @@ destFolder = 'outData/';
 
 %%PARAMETER SETTINGS <- YOU CAN EDIT THIS TO TRY DIFFERENT DATASET
 %pick one and comment the others
-datasetPath='CocktailParty'; 
+%datasetPath='CocktailParty'; 
 %datasetPath=['CoffeeBreak' filesep 'Seq1'];
-%datasetPath=['CoffeeBreak' filesep 'Seq2'];
+datasetPath=['CoffeeBreak' filesep 'Seq2'];
 
 %% DO NOT TOUCH
 %loading the person positions and the detected groups
@@ -33,7 +33,7 @@ GTgroups is a 1xN cells in which each cell contains the groups in the i-th frame
 
 %% SAVE FILES
 
-featuresID = fopen(strcat(destFolder, 'features.txt'),'w');
+featuresID = fopen(strcat(destFolder, 'coffeeBreak2_features.txt'),'w');
 for f=1:numel(features)
     fprintf(featuresID, '%d %d\n', f, size(features{f},1));
     for i=1:size(features{f},1)
@@ -42,7 +42,7 @@ for f=1:numel(features)
 end
 fclose(featuresID);
 
-gtID = fopen(strcat(destFolder, 'gt.txt'),'w');
+gtID = fopen(strcat(destFolder, 'coffeeBreak2_gt.txt'),'w');
 for i=1:numel(GTgroups)
     fprintf(gtID, '%d %d\n', i, numel(GTgroups{i}));
     for j=1:numel(GTgroups{i})

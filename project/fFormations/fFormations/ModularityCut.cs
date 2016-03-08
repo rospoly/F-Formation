@@ -251,8 +251,8 @@ namespace fFormations
             {
                 Evd<double> eigen = matrix.Evd();
                 Matrix<double> vectors = eigen.EigenVectors;
-             //   return vectors.SubMatrix(0, vectors.RowCount, vectors.ColumnCount-1, 1); //returns only 1st vector
-                return vectors.SubMatrix(0, vectors.RowCount, 0, 1);
+                return vectors.SubMatrix(0, vectors.RowCount, vectors.ColumnCount-1, 1); //returns only 1st vector
+             //   return vectors.SubMatrix(0, vectors.RowCount, 0, 1);
             }
 
             //returns 1 and -1 vector

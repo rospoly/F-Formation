@@ -21,8 +21,14 @@ namespace fFormations
     /// </summary>
     public partial class MainWindow : Window
     {
-        public string dataFile = @"input/features.txt";
+        public string dataFile = @"input/features.txt"; //cocktail party
         public string gtFile = @"input/gt.txt";
+
+        //public string dataFile = @"input/coffeeBreak_features.txt";
+        //public string gtFile = @"input/coffeeBreak_gt.txt";
+
+        //public string dataFile = @"input/coffeeBreak2_features.txt";
+        //public string gtFile = @"input/coffeeBreak2_gt.txt";
 
         public MainWindow()
         {
@@ -37,8 +43,8 @@ namespace fFormations
             List<Frame> frames = P.readData();
             Debug.WriteLine("Frames correctly read");
             List<Group> groups = P.readGT(frames);
-            Debug.WriteLine("GT correctly read"); */
-            
+            Debug.WriteLine("GT correctly read"); 
+            */
 
 
             /* MODULARITY CUT TEST 
@@ -55,8 +61,8 @@ namespace fFormations
                 Debug.Write("Frame " + f.IdFrame + ": ");
                 Debug.WriteLine(g);
           //      Debug.WriteLine("Correct = " + res[0] + " fp = " + res[1] + " fn = " + res[2]);
-            } */
-            
+            } 
+            */
 
             /* DATA MANAGER */
 
@@ -68,7 +74,7 @@ namespace fFormations
             IterationManager im = new IterationManager(dm);
             Method MC = new ModularityCut();
             Affinity Aff = new Proximity();
-            //Affinity Aff = new ProxOrient();
+          //  Affinity Aff = new ProxOrient();
             im.computeMethod(MC, Aff);
             CollectorResult res = im.comparison();
 
