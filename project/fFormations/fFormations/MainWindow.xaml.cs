@@ -37,8 +37,8 @@ namespace fFormations
             List<Frame> frames = P.readData();
             Debug.WriteLine("Frames correctly read");
             List<Group> groups = P.readGT(frames);
-            Debug.WriteLine("GT correctly read"); 
-            */
+            Debug.WriteLine("GT correctly read"); */
+            
 
 
             /* MODULARITY CUT TEST 
@@ -47,23 +47,23 @@ namespace fFormations
             {
                 Affinity aff = new Proximity(f);
                 //     Affinity aff = new ProxOrient(f);
-                ModularityCut mc = new ModularityCut(true);
+                ModularityCut mc = new ModularityCut();
                 mc.Initialize(aff);
                 Group g = mc.ComputeGroup();
-                List<int> res = Group.Compare(g, groups[f.IdFrame-1]);
+        //        List<int> res = Group.Compare(g, groups[f.IdFrame-1]);
                 
                 Debug.Write("Frame " + f.IdFrame + ": ");
                 Debug.WriteLine(g);
-                Debug.WriteLine("Correct = " + res[0] + " fp = " + res[1] + " fn = " + res[2]);
-            }
-            */
+          //      Debug.WriteLine("Correct = " + res[0] + " fp = " + res[1] + " fn = " + res[2]);
+            } */
+            
 
             /* DATA MANAGER */
 
-            //DataManager dm = new DataManager(dataFile, gtFile);
+            DataManager dm = new DataManager(dataFile, gtFile);
 
 
-            /* ITERATION MANAGER TEST 
+            /* ITERATION MANAGER TEST */
 
             IterationManager im = new IterationManager(dm);
             Method MC = new ModularityCut();
@@ -72,10 +72,11 @@ namespace fFormations
             im.computeMethod(MC, Aff);
             CollectorResult res = im.comparison();
 
+            Console.WriteLine(im.getComputationType());
             Console.WriteLine(res);
 
             Console.ReadLine();
-            */
+            
 
 
 
@@ -83,11 +84,11 @@ namespace fFormations
             //////////////////Rocco////////////////
             ///////////////////////////////////////
             
-            string dataFile = @"input/features.txt";
+         /*   string dataFile = @"input/features.txt";
             string gtFile = @"input/gt.txt";
             DataManager dm = new DataManager(dataFile, gtFile);
 
-            /*
+            
             foreach (Frame frame in dm.getAllFrames())
             {
                 Affinity a = new Proximity(frame);
@@ -102,7 +103,7 @@ namespace fFormations
                 Console.WriteLine(dm.getGTById(frame.IdFrame));
                 Console.ReadLine();
             }
-            */
+            
 
             IterationManager im = new IterationManager(dm);
           //  Method m = new ModularityCut();
@@ -111,7 +112,7 @@ namespace fFormations
             im.computeMethod(m, Aff);
             CollectorResult res = im.comparison();
             Console.WriteLine(res);
-            Console.ReadLine();
+            Console.ReadLine(); */
         }
     }
 }
