@@ -31,11 +31,11 @@ namespace fFormations
 
         }
 
-        public void Initialize(Affinity a)
+        public virtual void Initialize(Affinity a)
         {
             this.a = a;
             matrix = a.getCopyMatrix();
-            indexes = a.getCopyIndexes();
+            indexes = a.F.getCopyIndexes();
             //CopyFrame = a.getCopyFrame();
             ResetVector();
         }
@@ -50,18 +50,20 @@ namespace fFormations
                 if (CheckValidFunction())
                 {
                     List<int> temp = FindDominantGroup();
-                    if (StoppingCriterium(temp) || indexes.Count==1)
+
+                    List<int> pers = new List<int>();
+                    foreach (int j in temp)
+                    {
+                        pers.Add(indexes[j]);
+                    }
+                    
+                    if (StoppingCriterium(pers) || indexes.Count==1)
                     {
                         //g.addAllSingletons(allSingletons());
                         indexes.Clear();
                     }
                     else
                     {
-                        List<int> pers = new List<int>();
-                        foreach (int j in temp)
-                        {
-                            pers.Add(indexes[j]);
-                        }
                         g.addSubGroup(pers);
                         RemoveDominantGroup(temp, pers);
                     }
@@ -208,7 +210,7 @@ namespace fFormations
         /// false: go on with the research of DominantSet. Else consider the rest all singleton;
         /// </summary>
         /// <returns></returns>
-        public override bool StoppingCriterium(List<int> l = null)
+        public override bool StoppingCriterium(List<int> l)
         {
             return Math.Abs(ComputeFunction()) < DeltaZero;
         }
@@ -219,8 +221,18 @@ namespace fFormations
     class GlobalDominantSet : DominantSet
     {
         //public double DeltaValue;
+        Matrix<double> reservedMatrix;
+        List<int> reservedIndexes;
+        public GlobalDominantSet(double DeltaZero, double DeltaValue) : base(DeltaZero,DeltaValue){
 
-        public GlobalDominantSet(double DeltaZero, double DeltaValue) : base(DeltaZero,DeltaValue){}
+        }
+
+        public override void Initialize(Affinity a)
+        {
+            base.Initialize(a);
+            reservedMatrix = matrix.Clone();
+            reservedIndexes = new List<int>(indexes);
+        }
 
         /// <summary>
         /// false: go on with the research of DominantSet. Else consider the rest all singleton;
@@ -228,24 +240,29 @@ namespace fFormations
         /// <returns></returns>
         public override bool StoppingCriterium(List<int> l)
         {
+            //l è lista di persone
             //WeightedAffinity wa = new WeightedAffinity(matrix);
-            List<int> lp = new List<int>(l);
-            if (l.Count == matrix.ColumnCount)
-                return true;
-            for (int i = 0; i < matrix.ColumnCount; i++)
+            List<int> lp = new List<int>();
+            foreach (int id in l)
+            {
+                lp.Add(reservedIndexes.IndexOf(id));
+            }
+            //if (l.Count == matrix.ColumnCount)
+            //return true;
+            for (int i = 0; i < reservedMatrix.ColumnCount; i++)
             {
                 if (!lp.Contains(i))
                 {
                     lp.Add(i);
-                    Matrix<double> m = WeightedAffinity.convertListToMatrix(lp, matrix);
-                    if (WeightedAffinity.Weight(m, lp.Count - 1) < 0)
-                        return false;
+                    Matrix<double> m = WeightedAffinity.convertListToMatrix(lp, reservedMatrix);
+                    if (WeightedAffinity.Weight(m, lp.Count - 1) > 0)
+                        return true;
                     lp.Remove(i);
                 }
                 //prova a inserire dentro e calcolare il risultato
                 //se positivo allora ci sta bene!!
             }
-            return true;
+            return false;
         }
 
         public class WeightedAffinity

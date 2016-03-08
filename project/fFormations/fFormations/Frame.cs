@@ -13,6 +13,7 @@ namespace fFormations
 
         public List<Person> Persons { get; private set; }
         public Matrix<double> distances { get; private set; }
+        protected List<int> Indexes { get; set; }
         public int IdFrame { get; private set; }
         public int N { get; private set; }
 
@@ -21,6 +22,7 @@ namespace fFormations
             this.IdFrame = idFrame;
             this.Persons = persons;
             distances = Matrix<double>.Build.Dense(N, N);
+            Indexes = new List<int>();
             computeDistances();
         }
 
@@ -42,6 +44,8 @@ namespace fFormations
                     distances[p.HelpLabel, j.HelpLabel] = p.getDistance(j);
                 }
             }
+            for (int i = 0; i < distances.ColumnCount; i++)
+                Indexes.Add(getPersonByHelpLabel(i).ID);
         }
 
         public Frame getCopyFrame()
@@ -82,6 +86,20 @@ namespace fFormations
         public override int GetHashCode()
         {
             return IdFrame;
+        }
+        public List<int> getCopyIndexes()
+        {
+            return new List<int>(Indexes);
+        }
+
+        public List<int> getIndexByIdPerson(List<int> ids)
+        {
+            List<int> ret = new List<int>();
+            foreach(int id in ids)
+            {
+                ret.Add(Indexes.IndexOf(id));
+            }
+            return ret;
         }
     }
 }
