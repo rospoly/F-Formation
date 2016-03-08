@@ -13,7 +13,7 @@ namespace fFormations
         //protected List<int> Indexes { get; set; }
         protected Matrix<double> AdjacencyMatrix { get; set; }
         public Frame F { get; private set; }
-        private double scalarFactor = 15.0;
+        private double scalarFactor = 200.0;
         
         public Affinity(Frame f)
         {
