@@ -10,10 +10,10 @@ namespace fFormations
 {
     public abstract class Affinity
     {
-        protected List<int> Indexes { get; set; }
+        //protected List<int> Indexes { get; set; }
         protected Matrix<double> AdjacencyMatrix { get; set; }
         public Frame F { get; private set; }
-        private double scalarFactor = 2.0;
+        private double scalarFactor = 15.0;
         
         public Affinity(Frame f)
         {
@@ -35,7 +35,7 @@ namespace fFormations
         //Attenzione in questo modo l'affinità fra la stessa persona è negativa.
         public double ComputationRegularAffinity(int i, int j)
         {
-            return -Math.Exp(F.distances[i, j] / (2.0*scalarFactor*scalarFactor));
+            return Math.Exp(-F.distances[i, j] / (2.0*scalarFactor*scalarFactor));
         }
         //////////////////////////////////////////////////////////
 
@@ -48,9 +48,9 @@ namespace fFormations
         {
             if (F == null) return; //se non ho settato F dal costruttore devo chiamare l'overload del metodo
             AdjacencyMatrix = Matrix<double>.Build.Dense(F.N, F.N, HowToCompute);
-            Indexes = new List<int>();
-            for (int i = 0;i<AdjacencyMatrix.ColumnCount; i++)
-                Indexes.Add(F.getPersonByHelpLabel(i).ID);
+            //Indexes = new List<int>();
+            //for (int i = 0;i<AdjacencyMatrix.ColumnCount; i++)
+                //Indexes.Add(F.getPersonByHelpLabel(i).ID);
         }
 
         //calcola la matrice affinità dato un frame (Mara)
@@ -58,9 +58,9 @@ namespace fFormations
         {
             this.F = f;
             AdjacencyMatrix = Matrix<double>.Build.Dense(F.N, F.N, HowToCompute);
-            Indexes = new List<int>();
-            for (int i = 0; i < AdjacencyMatrix.ColumnCount; i++)
-                Indexes.Add(F.getPersonByHelpLabel(i).ID);
+            //Indexes = new List<int>();
+            //for (int i = 0; i < AdjacencyMatrix.ColumnCount; i++)
+                //Indexes.Add(F.getPersonByHelpLabel(i).ID);
         }
 
         public int getDimensionAM() {
@@ -72,10 +72,7 @@ namespace fFormations
             return copy;
         }
 
-        public List<int> getCopyIndexes()
-        {
-            return new List<int>(Indexes);
-        }
+       
 
     }
 }

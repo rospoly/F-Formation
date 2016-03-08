@@ -87,12 +87,12 @@ namespace fFormations
             string gtFile = @"input/gt.txt";
             DataManager dm = new DataManager(dataFile, gtFile);
 
-            /*
+            
             foreach (Frame frame in dm.getAllFrames())
             {
                 Affinity a = new Proximity(frame);
-                Method m = new ModularityCut();
-                //Method m = new LocalDominantSet(1E-3, 1E-4);
+                //Method m = new ModularityCut();
+                Method m = new GlobalDominantSet(1E-2, 1E-3);
                 //GlobalDominantSet(1E-10);
                 m.Initialize(a);
                 Group my = m.ComputeGroup();
@@ -102,15 +102,18 @@ namespace fFormations
                 Console.WriteLine(dm.getGTById(frame.IdFrame));
                 Console.ReadLine();
             }
-            */
+            
+    /*
             IterationManager im = new IterationManager(dm);
-            Method m = new ModularityCut();
-            //Method m = new LocalDominantSet(1E-1, 1E-2);
+            //Method m = new ModularityCut();
+            Method m = new GlobalDominantSet(1E-2,1E-3);
+            //new LocalDominantSet(1E-1, 1E-1);
             Affinity Aff = new Proximity();
             im.computeMethod(m, Aff);
             CollectorResult res = im.comparison();
             Console.WriteLine(res);
             Console.ReadLine();
+            */
         }
     }
 }
