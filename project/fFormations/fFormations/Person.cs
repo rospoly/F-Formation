@@ -28,9 +28,9 @@ namespace fFormations
         public int HelpLabel { get; set; }
         public int ID { get; private set; }
 
-        public double CoordX { get { return coordX; } set { if (value > 0) coordX = value; } }
-        public double CoordY { get { return coordY; } set { if (value > 0) coordY = value; } }
-        public double Angle { get { return angle; } set { if (Math.Abs(value) < Math.PI) angle = value; } }
+        public double CoordX { get { return coordX; } set { /*if (value > 0)*/ coordX = value; } }
+        public double CoordY { get { return coordY; } set { /*if (value > 0)*/ coordY = value; } }
+        public double Angle { get { return angle; } set { /*if (Math.Abs(value) < Math.PI)*/ angle = value; } }
 
         public Person(int id, double coordX, double coordY, double angle,int label) {
             this.ID = id;
