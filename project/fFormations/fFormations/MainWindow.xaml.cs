@@ -38,9 +38,7 @@ namespace fFormations
             Debug.WriteLine("Frames correctly read");
             List<Group> groups = P.readGT(frames);
             Debug.WriteLine("GT correctly read"); */
-            
-
-
+      
             /* MODULARITY CUT TEST 
 
             foreach(Frame f in frames)
@@ -58,12 +56,12 @@ namespace fFormations
             } */
             
 
-            /* DATA MANAGER */
+            /* DATA MANAGER 
 
             DataManager dm = new DataManager(dataFile, gtFile);
 
 
-            /* ITERATION MANAGER TEST */
+            /* ITERATION MANAGER TEST 
 
             IterationManager im = new IterationManager(dm);
             Method MC = new ModularityCut();
@@ -79,40 +77,59 @@ namespace fFormations
             
 
 
-
+            */
             ////////////////////////////////////////
             //////////////////Rocco////////////////
             ///////////////////////////////////////
             
-         /*   string dataFile = @"input/features.txt";
+            string dataFile = @"input/features.txt";
             string gtFile = @"input/gt.txt";
             DataManager dm = new DataManager(dataFile, gtFile);
-
-            
+            /*
+            CollectorResult res = new CollectorResult();
             foreach (Frame frame in dm.getAllFrames())
             {
                 Affinity a = new Proximity(frame);
-                Method m = new ModularityCut();
-                //Method m = new LocalDominantSet(1E-3, 1E-4);
+                //Method m = new ModularityCut();
+                Method m = new GlobalDominantSet(1E-2, 1E-7);
+                    //new LocalDominantSet(1E-3, 1E-4);
                 //GlobalDominantSet(1E-10);
                 m.Initialize(a);
                 Group my = m.ComputeGroup();
                 Result t = Group.Compare(my, dm.getGTById(frame.IdFrame),2.0/3.0);
-                Console.WriteLine(t);
+                res.addResult(t);
+                res.computeMeans();
                 Console.WriteLine(my);
                 Console.WriteLine(dm.getGTById(frame.IdFrame));
-                Console.ReadLine();
-            }
-            
 
+                Console.WriteLine(t);
+                Console.WriteLine(res);
+
+                Console.ReadLine();
+            }*/
+ 
+            
             IterationManager im = new IterationManager(dm);
-          //  Method m = new ModularityCut();
-            Method m = new LocalDominantSet(1E-1, 1E-2);
-            Affinity Aff = new Proximity();
-            im.computeMethod(m, Aff);
-            CollectorResult res = im.comparison();
-            Console.WriteLine(res);
-            Console.ReadLine(); */
+            //Method m = new ModularityCut();
+            double deltaValue = 0.1;
+            double deltaZero = 0.1;
+            for (int i = 1; i < 10; i++)
+            {
+               for (int j=1;j<10;j++)
+                {
+                   // Method m = new LocalDominantSet(1E-2, 1E-7);
+                    Method m = new GlobalDominantSet(deltaZero, deltaValue);
+                    Affinity Aff = new Proximity();
+                    im.computeMethod(m, Aff);
+                    CollectorResult res = im.comparison();
+                    Console.WriteLine(res);
+                    Console.WriteLine("i:"+i+", j:"+j);
+
+                    //Console.ReadLine();
+                    deltaZero = Math.Pow(10, -j);
+               }
+               deltaValue = Math.Pow(10, -i);
+            }
         }
     }
 }

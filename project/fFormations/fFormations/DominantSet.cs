@@ -39,39 +39,41 @@ namespace fFormations
             //CopyFrame = a.getCopyFrame();
             ResetVector();
         }
+        public List<int> FromLabelToId(List<int> hl) {
+            List<int> pers = new List<int>();
+            foreach (int j in hl)
+            {
+                pers.Add(indexes[j]);
+            }
+            return pers;
+        }
 
         public Group ComputeGroup()
         {
             ResetVector();
             Group g = new Group(a.F);
-            while (indexes.Count > 0)
+            while (indexes.Count > 1)
             {
                 while (RecursiveResearchMax() > DeltaValue) { };
                 if (CheckValidFunction())
                 {
-                    List<int> temp = FindDominantGroup();
-
-                    List<int> pers = new List<int>();
-                    foreach (int j in temp)
-                    {
-                        pers.Add(indexes[j]);
-                    }
-                    
-                    if (StoppingCriterium(pers) || indexes.Count==1)
+                    List<int> label = FindDominantGroup();
+                    List<int> ids = FromLabelToId(label);
+                    if (/*indexes.Count==1 || */StoppingCriterium(ids))
                     {
                         //g.addAllSingletons(allSingletons());
                         indexes.Clear();
                     }
                     else
                     {
-                        g.addSubGroup(pers);
-                        RemoveDominantGroup(temp, pers);
+                        g.addSubGroup(ids);
+                        RemoveDominantGroup(label, ids);
                     }
                 }
-                else
+                /*else
                 {
                     Console.WriteLine("SolutionNotCorrect");
-                }
+                }*/
             }
             return g;
         }
@@ -101,7 +103,7 @@ namespace fFormations
         /// Check if the current configuration of manager vector is inside de simplex and then valid solution.
         /// </summary>
         /// <returns></returns>
-        public bool CheckValidFunction()
+        public virtual bool CheckValidFunction()
         {
             //controllare
             return ((vector.ColumnSums()[0] >=1-DeltaValue) && (vector.ForAll(x => x >= 0)));
@@ -119,6 +121,7 @@ namespace fFormations
             if (val != 0)
             {
                 vector.MapIndexedInplace((index, colZero, value) => value * temp[index, colZero] / val, Zeros.Include);
+                
                 return Math.Abs(ComputeFunction() - val);
             }
             return 0;
@@ -132,10 +135,6 @@ namespace fFormations
         public abstract bool StoppingCriterium(List<int> l);
         public List<int> allSingletons()
         {
-            /*List<Person> singletons = new List<Person>();
-            foreach (int i in indexes)
-                singletons.Add(a.F.getPersonById(i));
-            */
             return new List<int>(indexes);
         }
 
@@ -171,25 +170,6 @@ namespace fFormations
                 matrix = GlobalDominantSet.WeightedAffinity.convertListToMatrix(temp, matrix);
                 ResetVector();
             }
-            /*foreach (int j in lp)
-            {
-                matrix=matrix.RemoveColumn(j);
-                matrix=matrix.RemoveRow(j);
-                vector=vector.RemoveRow(j);
-            }
-
-            Matrix<double> test = Matrix<double>.Build.Dense(matrix.ColumnCount-lp.Count, matrix.ColumnCount - lp.Count);
-            int j = 0;
-            for (int i = 0; i < matrix.ColumnCount; i++)
-                if (!lp.Contains(i))
-                {
-                    test.SetRow(j, matrix.Row(i));
-                    j++;
-                }*/
-
-
-            /*foreach(int value in values)
-                indexes.Remove(value);*/
         }
     }
 
