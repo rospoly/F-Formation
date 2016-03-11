@@ -19,6 +19,7 @@ C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fForm
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\bin\Debug\fFormations.pdb
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\bin\Debug\MathNet.Numerics.dll
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\bin\Debug\MathNet.Numerics.xml
+C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\fFormations.csprojResolveAssemblyReference.cache
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\MainWindow.g.cs
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\App.g.cs
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\fFormations_MarkupCompile.cache
@@ -29,4 +30,3 @@ C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fForm
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\fFormations.csproj.GenerateResource.Cache
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\fFormations.exe
 C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\fFormations.pdb
-C:\Users\Roky\Documents\GitHubVisualStudio\F-Formation\project\fFormations\fFormations\obj\Debug\fFormations.csprojResolveAssemblyReference.cache

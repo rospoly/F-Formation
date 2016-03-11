@@ -90,6 +90,9 @@ namespace fFormations
 
         public void computeMeans()
         {
+            precisionMean = 0;
+            recallMean = 0;
+            fMean = 0;
             if (l.Count != 0)
             {
                 foreach (Result r in l)
@@ -101,12 +104,6 @@ namespace fFormations
                 precisionMean /= l.Count;
                 recallMean /= l.Count;
                 fMean /= l.Count;
-            }
-            else
-            {
-                precisionMean = 0;
-                recallMean =0;
-                fMean = 0;
             }
         }
 
