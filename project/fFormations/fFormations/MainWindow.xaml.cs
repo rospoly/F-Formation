@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MathNet.Numerics.LinearAlgebra;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace fFormations
             Debug.WriteLine("Frames correctly read");
             List<Group> groups = P.readGT(frames);
             Debug.WriteLine("GT correctly read"); */
-      
+
             /* MODULARITY CUT TEST 
 
             foreach(Frame f in frames)
@@ -54,7 +55,7 @@ namespace fFormations
                 Debug.WriteLine(g);
           //      Debug.WriteLine("Correct = " + res[0] + " fp = " + res[1] + " fn = " + res[2]);
             } */
-            
+
 
             /* DATA MANAGER 
 
@@ -81,7 +82,7 @@ namespace fFormations
             ////////////////////////////////////////
             //////////////////Rocco////////////////
             ///////////////////////////////////////
-            
+
             string dataFile = @"input/features.txt";
             string gtFile = @"input/gt.txt";
             DataManager dm = new DataManager(dataFile, gtFile);
@@ -89,11 +90,15 @@ namespace fFormations
             CollectorResult res = new CollectorResult();
             foreach (Frame frame in dm.getAllFrames())
             {
-                Affinity a = new Proximity(frame);
+                //Affinity a = new SMEFO(frame);
+                Affinity a = new Proximity();
+                a.computeAffinity(frame);
                 //Method m = new ModularityCut();
                 Method m = new GlobalDominantSet(1E-2, 1E-7);
-                    //new LocalDominantSet(1E-3, 1E-4);
-                //GlobalDominantSet(1E-10);
+                //new AllSingleton(); 
+                //new GlobalDominantSet(1E-2, 1E-7);
+                //con 200 affinity ok
+                //new LocalDominantSet(1E-3, 1E-4);
                 m.Initialize(a);
                 Group my = m.ComputeGroup();
                 Result t = Group.Compare(my, dm.getGTById(frame.IdFrame),2.0/3.0);
@@ -106,29 +111,41 @@ namespace fFormations
                 Console.WriteLine(res);
 
                 Console.ReadLine();
-            }*/
- 
-            
+            }
+            Console.Write(res.getSumPrec());
+          
+            */
+
             IterationManager im = new IterationManager(dm);
             //Method m = new ModularityCut();
             double deltaValue = 0.1;
             double deltaZero = 0.1;
-            for (int i = 1; i < 10; i++)
-            {
-               for (int j=1;j<10;j++)
-                {
-                   // Method m = new LocalDominantSet(1E-2, 1E-7);
-                    Method m = new GlobalDominantSet(deltaZero, deltaValue);
-                    Affinity Aff = new Proximity();
-                    im.computeMethod(m, Aff);
-                    CollectorResult res = im.comparison();
-                    Console.WriteLine(res);
-                    Console.WriteLine("i:"+i+", j:"+j);
+            //double maxAverage = 0;
 
-                    //Console.ReadLine();
-                    deltaZero = Math.Pow(10, -j);
-               }
-               deltaValue = Math.Pow(10, -i);
+            for (int i = 1; i <= 8; i++)
+            {
+                for (int j = 1; j <= 8; j++)
+                {
+                    for (int val = 1; val <= 5; val = val + 4)
+                    {
+                        deltaValue = val*Math.Pow(10, -j);
+                        deltaZero = val*Math.Pow(10, -i);
+                        //{
+                        // Method m = new LocalDominantSet(1E-2, 1E-7);
+                        Method m = new GlobalDominantSet(deltaZero, deltaValue);
+                        Affinity Aff = new Proximity();
+                        //Aff.scalarFactor = val;
+                        im.computeMethod(m, Aff);
+                        CollectorResult res = im.comparison();
+                        Console.WriteLine((res.precisionMean + res.recallMean + res.fMean) / 3.0);
+                        Console.WriteLine("Delta Zero:" + deltaZero + ",Delta Value j:" + deltaValue);
+                        Console.WriteLine(res);
+                        Console.WriteLine("Go on" + i + ", " + j + "\n");
+                        //Console.ReadLine();
+                        //}
+                        
+                    }
+                }
             }
         }
     }
