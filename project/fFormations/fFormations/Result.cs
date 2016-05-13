@@ -88,6 +88,16 @@ namespace fFormations
             l.Add(r);
         }
 
+        public double getSumPrec()
+        {
+            double p = 0;
+            foreach (Result r in l)
+            {
+                p += r.precision;
+            }
+            return p;
+        }
+
         public void computeMeans()
         {
             precisionMean = 0;

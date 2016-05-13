@@ -46,7 +46,7 @@ namespace fFormations
         }*/
 
         public CollectorResult comparison() {
-            Console.WriteLine("GroupList computed has size: " + computed.Count);
+            //Console.WriteLine("GroupList computed has size: " + computed.Count);
             CollectorResult rs = new CollectorResult();
             foreach (Group g in computed) {
                 rs.addResult(Group.Compare(g,DM.getGTById(g.IdFrame.IdFrame),2.0/3.0));

@@ -61,12 +61,12 @@ namespace fFormations
             InitVectors(i, j);
             //In questo caso mi serve l'angolo della prima persona e quello della seconda
             valij = GetMeasure(i) - angleij;
-            valji = GetMeasure(i) - angleji;
+            valji = GetMeasure(j) - angleji;
             //Secondo me la ComputationRegularAffinity(i,j)=ComputationRegularAffinity(j,i)
             //Se entrambe le condizioni sono verificate, devo calcolare il valore
             //Se una delle due condizioni è falsa prendo 0, siccome la computazione
             //coinvolge un'esponenziale allora 0 è sicuramente minore.
-            if (ConditionRegularAffinity(valij) && ConditionRegularAffinity(valji))
+            if (ConditionRegularAffinity(valij) || ConditionRegularAffinity(valji))
             {
                 return ComputationRegularAffinity(i, j);
             }
@@ -84,13 +84,26 @@ namespace fFormations
     {
         public Vector<double> pf;//smefo values 
         public Vector<double> centers;//centers of focus
-
-        public SMEFO(Frame f) //: base(f)
+        public Matrix<double> tempProxMatrix;
+        /*public SMEFO(Frame f): base(f)
         {
-             pf = Vector<double>.Build.Dense(f.N); 
-             centers = Vector<double>.Build.Dense(f.N);
-        }
+            pf = Vector<double>.Build.Dense(f.N); 
+            centers = Vector<double>.Build.Dense(f.N);
+            Affinity tempProximity = new Proximity(f);
+            tempProxMatrix = tempProximity.getCopyMatrix();
+        }*/
 
+        public SMEFO() : base(){}
+
+        public override void InitOperation(Frame f)
+        {
+            pf = Vector<double>.Build.Dense(f.N);
+            centers = Vector<double>.Build.Dense(f.N);
+            Affinity tempProximity = new Proximity(f);
+            tempProximity.computeAffinity(f);
+            tempProxMatrix = tempProximity.getCopyMatrix();
+        }
+        
         public override double GetMeasure(int i)
         {
             //Qui uso lo SMEFO della persona con label i
@@ -102,7 +115,7 @@ namespace fFormations
         /// <param name="i"></param>
         /// <returns></returns>
         public double computeSMEFO(Person i) {
-            return Math.Acos(Vector.AngleBetween(new Vector(i.CoordX,i.CoordY),FocusCenters(i)));
+            return Math.Acos(Vector.AngleBetween(new Vector(i.CoordX,i.CoordY),FocusCenters(i)) * Math.PI / 180.0);
         }
 
         /// <summary>
@@ -114,8 +127,8 @@ namespace fFormations
             double sumx = 0;
             double sumy = 0;
             foreach (Person j in F.Persons) {
-                sumx = sumx + j.CoordX * AdjacencyMatrix[i.HelpLabel, j.HelpLabel];
-                sumy = sumy + j.CoordY * AdjacencyMatrix[i.HelpLabel, j.HelpLabel];
+                sumx = sumx + j.CoordX * tempProxMatrix[i.HelpLabel, j.HelpLabel];
+                sumy = sumy + j.CoordY * tempProxMatrix[i.HelpLabel, j.HelpLabel];
             }
             double degree = totalDegreeOf(i);
             return new Vector(sumx / degree, sumy / degree);
@@ -128,7 +141,7 @@ namespace fFormations
         /// <returns></returns>
         public double totalDegreeOf(Person i)
         {
-            return AdjacencyMatrix.Column(i.HelpLabel).Sum();
+            return tempProxMatrix.Column(i.HelpLabel).Sum();
         }
     }
 }

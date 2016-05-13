@@ -63,6 +63,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AllSingleton.cs" />
     <Compile Include="DominantSet.cs" />
     <Compile Include="IterationManager.cs" />
     <Compile Include="ModularityCut.cs" />
