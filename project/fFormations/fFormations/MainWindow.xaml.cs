@@ -24,11 +24,17 @@ namespace fFormations
         public string dataFile = @"input/features.txt";
         public string gtFile = @"input/gt.txt";
 
+        //public string dataFile = @"input/coffeeBreak_features.txt";
+        //public string gtFile = @"input/coffeeBreak_gt.txt";
+
+        //public string dataFile = @"input/coffeeBreak2_features.txt";
+        //public string gtFile = @"input/coffeeBreak2_gt.txt";
+
         public MainWindow()
         {
             InitializeComponent();
 
-            /* PARSER TEST 
+            /* PARSER TEST  
 
             //get singleton and set paths
             Parser P = Parser.getParser();
@@ -56,17 +62,17 @@ namespace fFormations
             } */
             
 
-            /* DATA MANAGER 
+            /* DATA MANAGER */
 
             DataManager dm = new DataManager(dataFile, gtFile);
 
 
-            /* ITERATION MANAGER TEST 
+            /* ITERATION MANAGER TEST */
 
             IterationManager im = new IterationManager(dm);
             Method MC = new ModularityCut();
-            Affinity Aff = new Proximity();
-            //Affinity Aff = new ProxOrient();
+          //  Affinity Aff = new Proximity();
+            Affinity Aff = new ProxOrient();
             im.computeMethod(MC, Aff);
             CollectorResult res = im.comparison();
 
@@ -75,17 +81,17 @@ namespace fFormations
 
             Console.ReadLine();
             
+            
 
-
-            */
+            
             ////////////////////////////////////////
             //////////////////Rocco////////////////
             ///////////////////////////////////////
-            
+            /*
             string dataFile = @"input/features.txt";
             string gtFile = @"input/gt.txt";
             DataManager dm = new DataManager(dataFile, gtFile);
-            /*
+            
             CollectorResult res = new CollectorResult();
             foreach (Frame frame in dm.getAllFrames())
             {
@@ -106,7 +112,7 @@ namespace fFormations
                 Console.WriteLine(res);
 
                 Console.ReadLine();
-            }*/
+            }
  
             
             IterationManager im = new IterationManager(dm);
@@ -129,7 +135,7 @@ namespace fFormations
                     deltaZero = Math.Pow(10, -j);
                }
                deltaValue = Math.Pow(10, -i);
-            }
+            } */
         }
     }
 }

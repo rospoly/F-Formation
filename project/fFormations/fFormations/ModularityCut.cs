@@ -41,7 +41,7 @@ namespace fFormations
             computeNormTerm();
             computeModularityMatrix();
 
-            firstSplit = new Split(labels, this); //the first split contains all elements
+            firstSplit = new Split(labels, this, B); //the first split contains all elements
         }
 
         public Group ComputeGroup()
@@ -122,7 +122,8 @@ namespace fFormations
             for (int i = 0; i < N; i++)
                 for (int j = 0; j < N; j++)
                     m += A[i, j];
-            return m * 0.5;
+            m = m * 0.5;
+            return m;
         }
 
         
@@ -133,6 +134,14 @@ namespace fFormations
             public int[] members;
             public Matrix<double> Bg; //mod matrix of the current subgraph
             private int n;
+
+            public Split(int[] members, ModularityCut mc, Matrix<double> B)
+            {
+                this.members = members;
+                n = members.Length; //elements in THIS split
+                modCut = mc;
+                Bg = B;
+            }
 
             public Split(int[] members, ModularityCut mc)
             {
@@ -202,13 +211,13 @@ namespace fFormations
                     if (partitionVector[i, 0] == 1) S[i, 0] = 1;
                     else S[i, 1] = 1;
 
-                double deltaQ =  (S.Transpose() * Bg * S).Trace() / (2 * modCut.m);
+                double deltaQ = (S.Transpose() * Bg * S).Trace() / (2 * modCut.m);
                 //Debug.WriteLine("DeltaQ = " + deltaQ);
-                if (deltaQ < 0) return true; //modularity decreases, we can split
+                if (deltaQ > 1E-3) return true; //modularity decreases, we can split
                 else return false;
 
-                //double Q = (1 / (4 * modCut.m)) * (partitionVector.Transpose() * Bg * partitionVector)[0,0];
-                //if (Q < -0.3) return true;
+                //double Q = (1 / (4 * modCut.m)) * (partitionVector.Transpose() * Bg * partitionVector)[0, 0];
+                //if (Q > 0.01) return true;
                 //else return false;
             }
 
@@ -251,8 +260,7 @@ namespace fFormations
             {
                 Evd<double> eigen = matrix.Evd();
                 Matrix<double> vectors = eigen.EigenVectors;
-                return vectors.SubMatrix(0, vectors.RowCount, vectors.ColumnCount-1, 1); //returns only 1st vector
-             //   return vectors.SubMatrix(0, vectors.RowCount, 0, 1);
+                return vectors.SubMatrix(0, vectors.RowCount, vectors.ColumnCount-1, 1); //returns only last vector
             }
 
             //returns 1 and -1 vector
