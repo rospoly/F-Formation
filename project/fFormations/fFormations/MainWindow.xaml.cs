@@ -1,5 +1,4 @@
-﻿using MathNet.Numerics.LinearAlgebra;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -25,11 +24,17 @@ namespace fFormations
         public string dataFile = @"input/features.txt";
         public string gtFile = @"input/gt.txt";
 
+        //public string dataFile = @"input/coffeeBreak_features.txt";
+        //public string gtFile = @"input/coffeeBreak_gt.txt";
+
+        //public string dataFile = @"input/coffeeBreak2_features.txt";
+        //public string gtFile = @"input/coffeeBreak2_gt.txt";
+
         public MainWindow()
         {
             InitializeComponent();
 
-            /* PARSER TEST 
+            /* PARSER TEST  
 
             //get singleton and set paths
             Parser P = Parser.getParser();
@@ -39,7 +44,7 @@ namespace fFormations
             Debug.WriteLine("Frames correctly read");
             List<Group> groups = P.readGT(frames);
             Debug.WriteLine("GT correctly read"); */
-
+      
             /* MODULARITY CUT TEST 
 
             foreach(Frame f in frames)
@@ -55,19 +60,19 @@ namespace fFormations
                 Debug.WriteLine(g);
           //      Debug.WriteLine("Correct = " + res[0] + " fp = " + res[1] + " fn = " + res[2]);
             } */
+            
 
-
-            /* DATA MANAGER 
+            /* DATA MANAGER */
 
             DataManager dm = new DataManager(dataFile, gtFile);
 
 
-            /* ITERATION MANAGER TEST 
+            /* ITERATION MANAGER TEST */
 
             IterationManager im = new IterationManager(dm);
             Method MC = new ModularityCut();
-            Affinity Aff = new Proximity();
-            //Affinity Aff = new ProxOrient();
+          //  Affinity Aff = new Proximity();
+            Affinity Aff = new ProxOrient();
             im.computeMethod(MC, Aff);
             CollectorResult res = im.comparison();
 
@@ -76,32 +81,28 @@ namespace fFormations
 
             Console.ReadLine();
             
+            
 
-
-            */
+            
             ////////////////////////////////////////
             //////////////////Rocco////////////////
             ///////////////////////////////////////
-
+            /*
             string dataFile = @"input/features.txt";
             string gtFile = @"input/gt.txt";
             DataManager dm = new DataManager(dataFile, gtFile);
-           
+            
             CollectorResult res = new CollectorResult();
-            Method m = new LocalDominantSet(1E-2, 1E-3);
             foreach (Frame frame in dm.getAllFrames())
             {
-                //Affinity a = new SMEFO(frame);
-                Affinity a = new Proximity();
-                a.computeAffinity(frame);
+                Affinity a = new Proximity(frame);
                 //Method m = new ModularityCut();
-                //new AllSingleton(); 
-                //new GlobalDominantSet(1E-2, 1E-7);
-                //con 200 affinity ok
-                //new LocalDominantSet(1E-3, 1E-4);
+                Method m = new GlobalDominantSet(1E-2, 1E-7);
+                    //new LocalDominantSet(1E-3, 1E-4);
+                //GlobalDominantSet(1E-10);
                 m.Initialize(a);
                 Group my = m.ComputeGroup();
-                Result t = Group.Compare(my, dm.getGTById(frame.IdFrame),3.0/5.0);
+                Result t = Group.Compare(my, dm.getGTById(frame.IdFrame),2.0/3.0);
                 res.addResult(t);
                 res.computeMeans();
                 Console.WriteLine(my);
@@ -112,41 +113,29 @@ namespace fFormations
 
                 Console.ReadLine();
             }
-            Console.Write(res.getSumPrec());
-          
-            /*
-
+ 
+            
             IterationManager im = new IterationManager(dm);
             //Method m = new ModularityCut();
-            //double deltaValue = 0.1;
-            //double deltaZero = 0.1;
-            //double maxAverage = 0;
+            double deltaValue = 0.1;
+            double deltaZero = 0.1;
+            for (int i = 1; i < 10; i++)
+            {
+               for (int j=1;j<10;j++)
+                {
+                   // Method m = new LocalDominantSet(1E-2, 1E-7);
+                    Method m = new GlobalDominantSet(deltaZero, deltaValue);
+                    Affinity Aff = new Proximity();
+                    im.computeMethod(m, Aff);
+                    CollectorResult res = im.comparison();
+                    Console.WriteLine(res);
+                    Console.WriteLine("i:"+i+", j:"+j);
 
-            //for (int i = 1; i <= 8; i++)
-            //{
-               // for (int j = 1; j <= 8; j++)
-                //{
-                   // for (int val = 1; val <= 5; val = val + 4)
-                    //{
-                       // deltaValue = val*Math.Pow(10, -j);
-                        //deltaZero = val*Math.Pow(10, -i);
-                        //{
-                        // Method m = new LocalDominantSet(1E-2, 1E-7);
-                        Method m = new GlobalDominantSet(1E-2, 1E-7);
-                        Affinity Aff = new SMEFO();
-                        //Aff.scalarFactor = val;
-                        im.computeMethod(m, Aff);
-                        CollectorResult res = im.comparison();
-                        //Console.WriteLine("Delta Zero:" + deltaZero + ",Delta Value j:" + deltaValue);
-                        Console.WriteLine(res);
-                        //Console.WriteLine("Go on" + i + ", " + j + "\n");
-                        //Console.ReadLine();
-                        //}
-                        
-//                    }
- //               }
- //           }
-            */
+                    //Console.ReadLine();
+                    deltaZero = Math.Pow(10, -j);
+               }
+               deltaValue = Math.Pow(10, -i);
+            } */
         }
     }
 }
