@@ -13,9 +13,7 @@ namespace fFormations
         //protected List<int> Indexes { get; set; }
         protected Matrix<double> AdjacencyMatrix { get; set; }
         public Frame F { get; private set; }
-
-
-        public double scalarFactor=100;//15;//
+        public double scalarFactor=20;
 
         public Affinity(Frame f)
         {
@@ -30,9 +28,12 @@ namespace fFormations
         //Metodi di default offerti dalla nostra classe Affinity//
         public bool ConditionRegularAffinity(double valij)
         {
-            return ((valij >= Math.PI / 2.0) && (valij <= 3 * Math.PI / 2.0) ||
-                    (valij <= -Math.PI / 2.0) && (valij >= -3 * Math.PI / 2.0));
+            return (((valij <= Math.PI / 2.0) && (valij >= -Math.PI / 2.0)) ||
+                    ((valij >= 3* Math.PI / 2.0) && (valij <= 2*Math.PI)));
+            //return (((valij <= Math.PI / 2.0) && (valij >= -Math.PI / 2.0)) ||
+            //((valij >= 3*Math.PI / 2.0) && (valij <= -3 * Math.PI / 2.0)));
             //((Math.Abs(valij)>= (1.5*Math.PI)) && ((Math.Abs(valij % (2.0 * Math.PI)) >= (Math.PI / 2.0))));
+            //return (valij + Math.PI / 2 >= 0) && (ProxOrient.AngleDifference(valij,Math.PI/2)<=0);
         }
 
         public double ComputationRegularAffinity(int i, int j)

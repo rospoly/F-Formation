@@ -28,7 +28,6 @@ namespace fFormations
         {
             this.DeltaZero = DeltaZero;
             this.DeltaValue = DeltaValue;
-
         }
 
         public virtual void Initialize(Affinity a)
@@ -36,7 +35,6 @@ namespace fFormations
             this.a = a;
             matrix = a.getCopyMatrix();
             indexes = a.F.getCopyIndexes();
-            //CopyFrame = a.getCopyFrame();
             ResetVector();
         }
         public List<int> FromLabelToId(List<int> hl)
@@ -53,6 +51,17 @@ namespace fFormations
         {
             ResetVector();
             Group g = new Group(a.F);
+
+            /*for (int j = 0; j < matrix.RowCount; j++)
+            {
+                for (int i = 0; i < matrix.ColumnCount; i++)
+                {
+                    Console.Write(Math.Round(matrix[j, i], 1) + "  ");
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine();
+            */
             while (indexes.Count > 1)
             {
                 while (RecursiveResearchMax() > DeltaValue) { };
@@ -60,9 +69,23 @@ namespace fFormations
                 {
                     List<int> label = FindDominantGroup();
                     List<int> ids = FromLabelToId(label);
+                    /*
+                    for (int i=0;i<vector.RowCount;i++)
+                        Console.Write(Math.Round(vector[i,0],1)+ "  ");
+                    Console.WriteLine();
+
+                    for (int j = 0; j < matrix.RowCount; j++)
+                    {
+                        for (int i = 0; i < matrix.ColumnCount; i++)
+                        {
+                            Console.Write(Math.Round(matrix[j, i],3)+ "  ");
+                        }
+                        Console.WriteLine();
+                    }
+                    Console.WriteLine();
+                    */
                     if (StoppingCriterium(ids))
                     {
-                        //g.addAllSingletons(allSingletons());
                         indexes.Clear();
                     }
                     else
@@ -81,8 +104,7 @@ namespace fFormations
         /// </summary>
         public void ResetVector()
         {
-            //vettore colonna
-            vector = Matrix<double>.Build.Dense(matrix.ColumnCount, 1, 1.0 / (double)matrix.ColumnCount);
+            vector = Matrix<double>.Build.Dense(matrix.ColumnCount, 1, 1.0 / matrix.ColumnCount);
         }
 
         /// <summary>
@@ -93,7 +115,7 @@ namespace fFormations
         /// </returns>
         public double ComputeFunction()
         {
-            return (vector.Transpose().Multiply(matrix).Multiply(vector))[0, 0];
+            return (((vector.Transpose()).Multiply(matrix)).Multiply(vector))[0, 0];
         }
 
         /// <summary>
@@ -112,13 +134,11 @@ namespace fFormations
         /// </summary>
         public double RecursiveResearchMax()
         {
-            Matrix<double> temp = matrix.Multiply(vector);
             double val = ComputeFunction();
-            //vector.MapIndexed<double>((index, value) => vector[index] = value * temp[index] / val);
-            if (val != 0)
-            {
+            Matrix<double> temp = matrix.Multiply(vector);
+            if (val > 0) { 
                 vector.MapIndexedInplace((index, colZero, value) => value * (temp[index, colZero] / val));
-                return Math.Abs(ComputeFunction() - val);
+                return ComputeFunction() - val;
             }
             return 0;
         }
@@ -147,7 +167,7 @@ namespace fFormations
             int i = 0;
             for (i = 0; i < vector.RowCount; i++)
             {
-                if (!(Math.Abs(vector[i, 0]) <= DeltaZero))
+                if (Math.Abs(vector[i, 0]) > DeltaZero)
                 {
                     //siamo in presenza di un i buono
                     //int ps = indexes[i];
@@ -159,7 +179,6 @@ namespace fFormations
 
         public virtual void RemoveDominantGroup(List<int> lp, List<int> values)
         {
-
             indexes.RemoveAll(x => values.Contains(x));
             List<int> temp = Enumerable.Range(0, matrix.ColumnCount).Except(lp).ToList();
             if (temp.Count != 0)
@@ -197,7 +216,6 @@ namespace fFormations
 
     class GlobalDominantSet : DominantSet
     {
-        //public double DeltaValue;
         Matrix<double> reservedMatrix;
         List<int> reservedIndexes;
         public GlobalDominantSet(double DeltaZero, double DeltaValue) : base(DeltaZero, DeltaValue) { }
@@ -209,50 +227,25 @@ namespace fFormations
             reservedIndexes = new List<int>(indexes);
         }
 
-        /*public override bool CheckValidFunction()
-        {
-            for (int i = 0; i < matrix.ColumnCount; i++)
-            {
-                if (!tmp.Contains(i))
-                {
-                    tmp.Add(i);
-                    Matrix<double> m = WeightedAffinity.convertListToMatrix(tmp, matrix);
-                    if (!(WeightedAffinity.Weight(m, tmp.Count - 1) > 0))
-                        tmp.Remove(i);
-                }
-            }
-            vector.MapIndexedInplace((index, colZero, value) => tmp.Contains(index) ? 1 : 0.0);
-            return true;
-        }*/
-
         /// <summary>
         /// false: go on with the research of DominantSet. Else consider the rest all singleton;
         /// </summary>
         /// <returns></returns>
         public override bool StoppingCriterium(List<int> l)
         {
-            //l è lista di persone
-            //WeightedAffinity wa = new WeightedAffinity(matrix);
-            if (l.Count == matrix.ColumnCount)
-                return false;
+             if (l.Count == reservedMatrix.ColumnCount)
+                 return false;
 
             List<int> lp = new List<int>();
             foreach (int id in l)
             {
                 lp.Add(reservedIndexes.IndexOf(id));
             }
-
+            
             for (int i = 0; i < reservedMatrix.ColumnCount; i++)
             {
                 if (!lp.Contains(i))
                 {
-                    /////////////////
-                    //List<int> testW = new List<int>(lp);
-                    //testW.Sort();
-                    //testW.Reverse();
-                    //testW.Add(i);
-                    //Matrix<double> testM = WeightedAffinity.convertListToMatrix(testW, reservedMatrix);
-                    ///////////////
                     lp.Add(i);
                     Matrix<double> m = WeightedAffinity.convertListToMatrix(lp, reservedMatrix);
                     
@@ -266,16 +259,11 @@ namespace fFormations
                 //se positivo allora ci sta bene!!
             }
             return false;
+            
         }
 
         public class WeightedAffinity
         {
-            //Matrix<double> affinity;
-            //public WeightedAffinity(Matrix<double> affinity)
-            //{
-            //this.affinity = affinity.Clone();
-            //}
-
             public static Matrix<double> convertListToMatrix(List<int> l, Matrix<double> affinity)
             {
                 Matrix<double> res = Matrix<double>.Build.Dense(l.Count, l.Count);
@@ -330,6 +318,7 @@ namespace fFormations
             {
                 if (v.ColumnCount == 1)
                     return 1;
+
                 double sum2 = 0;
                 Matrix<double> temp2 = v.RemoveColumn(index).RemoveRow(index);
                 for (int c = 0; c < temp2.ColumnCount; c++)

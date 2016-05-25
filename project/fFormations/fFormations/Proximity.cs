@@ -53,20 +53,47 @@ namespace fFormations
             vector2.Y = F.getPersonByHelpLabel(j).CoordY;
             //angolo fra i due vettori, dovrebbero essere uguali a meno di un segno forse.
             //angolo misurato in gradi quindi converto in radianti
-            angleij = Vector.AngleBetween(vector1, vector2) * Math.PI / 180.0;
-            angleji = Vector.AngleBetween(vector2, vector1) * Math.PI / 180.0;//dovrebbe cambiare solo il segno
+
+            //angleij = Vector.AngleBetween(vector1, vector2) * Math.PI / 180.0;
+            //angleji = Vector.AngleBetween(vector2, vector1) * Math.PI / 180.0;//dovrebbe cambiare solo il segno
+            Vector vij = vector2 - vector1;
+            Vector vji = vector1 - vector2;
+            //angleij = -Math.Acos(Math.Abs(vector1.X-vector2.X) / Math.Sqrt((vij.X * vij.X) + (vij.Y * vij.Y)));
+            //angleji = -(angleij - Math.PI);
+            angleij= Vector.AngleBetween(new Vector(1, 0), vij) * Math.PI / 180.0;
+            angleji= Vector.AngleBetween(new Vector(1, 0), vji) * Math.PI / 180.0;
+
+            //double angleTemp1 = Vector.AngleBetween(new Vector(1, 0),vij)* Math.PI / 180.0;
+            //double angleTemp2= Vector.AngleBetween(new Vector(1, 0),vji) * Math.PI / 180.0;
+            //Math.Acos(Math.Abs(vector1.X-vector2.X) / Math.Sqrt((vji.X * vji.X) + (vji.Y * vji.Y)));
+        }
+
+        public static double AngleDifference(double a,double b)
+        {
+            double d= a - b;
+            return AngleNorm(d);
+        }
+
+        public static double AngleNorm(double d) {
+            while (d < -Math.PI)
+                d = d + 2 * Math.PI;
+            while (d > Math.PI)
+                d = d - 2 * Math.PI;
+            return d;
         }
 
         public override double HowToCompute(int i, int j) {
+            if (i == j)
+                return 1;
             InitVectors(i, j);
             //In questo caso mi serve l'angolo della prima persona e quello della seconda
-            valij = GetMeasure(i) - angleij;
-            valji = GetMeasure(j) - angleji;
+            valij = AngleDifference(GetMeasure(i),angleij);
+            valji = AngleDifference(GetMeasure(j),angleji);
             //Secondo me la ComputationRegularAffinity(i,j)=ComputationRegularAffinity(j,i)
             //Se entrambe le condizioni sono verificate, devo calcolare il valore
             //Se una delle due condizioni è falsa prendo 0, siccome la computazione
             //coinvolge un'esponenziale allora 0 è sicuramente minore.
-            if (ConditionRegularAffinity(valij) || ConditionRegularAffinity(valji))
+            if (ConditionRegularAffinity(valij) && ConditionRegularAffinity(valji))
             {
                 return ComputationRegularAffinity(i, j);
             }
