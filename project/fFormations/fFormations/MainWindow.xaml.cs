@@ -64,72 +64,60 @@ namespace fFormations
 
             /* DATA MANAGER */
 
-            DataManager dm = new DataManager(dataFile, gtFile);
+            //DataManager dm = new DataManager(dataFile, gtFile);
 
 
             /* ITERATION MANAGER TEST */
+            /*
+            IterationManager im = new IterationManager(dm);
+            Method MC = new ModularityCut();
+          //  Affinity Aff = new Proximity();
+            Affinity Aff = new ProxOrient();
+            im.computeMethod(MC, Aff);
+            CollectorResult res = im.comparison();
 
-            CollectorResult res = new CollectorResult();
-            List<string> val = new List<string>();
+            Console.WriteLine(im.getComputationType());
+            Console.WriteLine(res);
 
-            for (double e = 1E-6; e < 5E-4; e = e + 2E-6)
-            {
-                IterationManager im = new IterationManager(dm);
-                Method MC = new ModularityCut(e);
-                Affinity Aff = new Proximity(200);
-              //  Affinity Aff = new ProxOrient();
-                im.computeMethod(MC, Aff);
-
-                res = im.comparison();
-                Console.WriteLine(e);
-                Console.WriteLine(im.getComputationType());
-                Console.WriteLine(res);
-
-                val.Add(e + " " + res.precisionMean + " " + res.recallMean + " " + res.fMean);
-                //Console.ReadLine();
-            }
-
-            string[] values = val.ToArray();
-            System.IO.File.WriteAllLines(@"output/modcut_prox_epsilonTest.txt", values);
-
-
+            Console.ReadLine();
+            
+            */
 
 
             ////////////////////////////////////////
             //////////////////Rocco////////////////
             ///////////////////////////////////////
-            /*      
-                  string dataFile = @"input/features.txt";
-                  string gtFile = @"input/gt.txt";
-                  DataManager dm = new DataManager(dataFile, gtFile);
 
-                  CollectorResult res = new CollectorResult();
-               //   Method m = new GlobalDominantSet(1E-1, 5E-2);
-                  foreach (Frame frame in dm.getAllFrames())
-                  {
-                      //Affinity a = new SMEFO(frame);
-                      //   Affinity a = new ProxOrient();
-                      Proximity a = new Proximity(200);
-                      a.computeAffinity(frame);
-                      Method m = new ModularityCut(1E-4);
-                      //new AllSingleton(); 
-                      //new GlobalDominantSet(1E-2, 1E-7);
-                      //con 200 affinity ok
-                      //new LocalDominantSet(1E-3, 1E-4);
-                      m.Initialize(a);
-                      Group my = m.ComputeGroup();
-                      Result t = Group.Compare(my, dm.getGTById(frame.IdFrame), 3.0 / 5.0);
-                      res.addResult(t);
-                      res.computeMeans();
-                      Console.WriteLine(my);
-                      Console.WriteLine(dm.getGTById(frame.IdFrame));
+            string dataFile = @"input/features.txt";
+            string gtFile = @"input/gt.txt";
+            DataManager dm = new DataManager(dataFile, gtFile);
 
-                      Console.WriteLine(t);
-                      Console.WriteLine(res);
+            CollectorResult res = new CollectorResult();
+            Method m = new GlobalDominantSet(1E-1, 5E-2);
+            foreach (Frame frame in dm.getAllFrames())
+            {
+                //Affinity a = new SMEFO(frame);
+                Affinity a = new ProxOrient(15,Math.PI/2.0);
+                a.computeAffinity(frame);
+                //Method m = new ModularityCut();
+                //new AllSingleton(); 
+                //new GlobalDominantSet(1E-2, 1E-7);
+                //con 200 affinity ok
+                //new LocalDominantSet(1E-3, 1E-4);
+                m.Initialize(a);
+                Group my = m.ComputeGroup();
+                Result t = Group.Compare(my, dm.getGTById(frame.IdFrame), 3.0 / 5.0);
+                res.addResult(t);
+                res.computeMeans();
+                Console.WriteLine(my);
+                Console.WriteLine(dm.getGTById(frame.IdFrame));
 
-                      Console.ReadLine();
-                  }
-                  Console.Write(res.getSumPrec()); */
+                Console.WriteLine(t);
+                Console.WriteLine(res);
+
+                Console.ReadLine();
+            }
+            Console.Write(res.getSumPrec());
 
             /*
             IterationManager im = new IterationManager(dm);
