@@ -51,39 +51,18 @@ namespace fFormations
         {
             ResetVector();
             Group g = new Group(a.F);
-
-            /*for (int j = 0; j < matrix.RowCount; j++)
-            {
-                for (int i = 0; i < matrix.ColumnCount; i++)
-                {
-                    Console.Write(Math.Round(matrix[j, i], 1) + "  ");
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine();
-            */
+            Utils.printMatrix(matrix);
             while (indexes.Count > 1)
             {
-                while (RecursiveResearchMax() > DeltaValue) { };
+                while (RecursiveResearchMax() > DeltaValue) {};
                 if (CheckValidFunction())
                 {
                     List<int> label = FindDominantGroup();
                     List<int> ids = FromLabelToId(label);
-                    /*
-                    for (int i=0;i<vector.RowCount;i++)
-                        Console.Write(Math.Round(vector[i,0],1)+ "  ");
-                    Console.WriteLine();
 
-                    for (int j = 0; j < matrix.RowCount; j++)
-                    {
-                        for (int i = 0; i < matrix.ColumnCount; i++)
-                        {
-                            Console.Write(Math.Round(matrix[j, i],3)+ "  ");
-                        }
-                        Console.WriteLine();
-                    }
-                    Console.WriteLine();
-                    */
+                    Utils.printMatrix(vector);
+                    Utils.printMatrix(matrix);
+                    
                     if (StoppingCriterium(ids))
                     {
                         indexes.Clear();
@@ -148,18 +127,12 @@ namespace fFormations
         /// It receive the last dominant group computed.
         /// </summary>
         /// <returns></returns>
-        public abstract bool StoppingCriterium(List<int> l);
-        /*public List<int> allSingletons()
-        {
-            return new List<int>(indexes);
-        }
-        */
+        public abstract bool StoppingCriterium(List<int> l=null);
 
         /// <summary>
         /// What to do when a stationary point is found!
         /// </summary>
         /// <returns></returns>
-        //public abstract List<int> FindDominantGroup();
 
         public virtual List<int> FindDominantGroup()
         {
@@ -169,8 +142,6 @@ namespace fFormations
             {
                 if (Math.Abs(vector[i, 0]) > DeltaZero)
                 {
-                    //siamo in presenza di un i buono
-                    //int ps = indexes[i];
                     lp.Add(i);
                 }
             }
@@ -183,7 +154,7 @@ namespace fFormations
             List<int> temp = Enumerable.Range(0, matrix.ColumnCount).Except(lp).ToList();
             if (temp.Count != 0)
             {
-                matrix = GlobalDominantSet.WeightedAffinity.convertListToMatrix(temp, matrix);
+                matrix = WeightedAffinity.convertListToMatrix(temp, matrix);
                 ResetVector();
             }
         }
@@ -197,21 +168,15 @@ namespace fFormations
         /// </summary>
         //double DeltaValue;
         //Frame CopyFrame;
-        public LocalDominantSet(double DeltaZero, double DeltaValue) : base(DeltaZero, DeltaValue)
-        {
-            //this.DeltaValue = DeltaValue;
-        }
-
+        public LocalDominantSet(double DeltaZero, double DeltaValue) : base(DeltaZero, DeltaValue){}
         /// <summary>
         /// false: go on with the research of DominantSet. Else consider the rest all singleton;
         /// </summary>
         /// <returns></returns>
-        public override bool StoppingCriterium(List<int> l)
+        public override bool StoppingCriterium(List<int> l=null)
         {
             return Math.Abs(ComputeFunction()) < DeltaZero;
         }
-
-
     }
 
     class GlobalDominantSet : DominantSet
@@ -233,7 +198,7 @@ namespace fFormations
         /// <returns></returns>
         public override bool StoppingCriterium(List<int> l)
         {
-             if (l.Count == reservedMatrix.ColumnCount)
+            if (l.Count == reservedMatrix.ColumnCount)
                  return false;
 
             List<int> lp = new List<int>();
@@ -255,84 +220,80 @@ namespace fFormations
                     }
                     lp.Remove(i);
                 }
-                //prova a inserire dentro e calcolare il risultato
-                //se positivo allora ci sta bene!!
             }
-            return false;
-            
+            return false;  
+        }
+    }
+    public class WeightedAffinity
+    {
+        public static Matrix<double> convertListToMatrix(List<int> l, Matrix<double> affinity)
+        {
+            Matrix<double> res = Matrix<double>.Build.Dense(l.Count, l.Count);
+            for (int i = 0; i < res.ColumnCount; i++)
+            {
+                for (int j = 0; j < res.ColumnCount; j++)
+                {
+                    res[i, j] = affinity[l[i], l[j]];
+                }
+            }
+            return res;
+        }
+        //Lista di indice e index è indice nella lista
+        public static double WeightedDegree(Matrix<double> res, int index)
+        {
+            return ((1.0 / res.ColumnCount) * (res.Row(index).Sum()));
+        }
+        /// <summary>
+        /// La differenza fra l'affinità di i e S, e l'affinità tra i e J.
+        /// </summary>
+        /// <param name="v">
+        /// Il vettore cui appartiene i
+        /// </param>
+        /// <param name="j">
+        /// Il peso del collegamento tra i e j
+        /// </param>
+        /// <returns></returns>
+        public static double RelativeAffinity(Matrix<double> res, int index, double aij)
+        {
+            return (aij - WeightedDegree(res, index));
         }
 
-        public class WeightedAffinity
+
+        public static double Weight(Matrix<double> v, int index)
         {
-            public static Matrix<double> convertListToMatrix(List<int> l, Matrix<double> affinity)
-            {
-                Matrix<double> res = Matrix<double>.Build.Dense(l.Count, l.Count);
-                for (int i = 0; i < res.ColumnCount; i++)
-                {
-                    for (int j = 0; j < res.ColumnCount; j++)
-                    {
-                        res[i, j] = affinity[l[i], l[j]];
-                    }
-                }
-                return res;
-            }
-            //Lista di indice e index è indice nella lista
-            public static double WeightedDegree(Matrix<double> res, int index)
-            {
-                return ((1.0 / res.ColumnCount) * (res.Row(index).Sum()));
-            }
-            /// <summary>
-            /// La differenza fra l'affinità di i e S, e l'affinità tra i e J.
-            /// </summary>
-            /// <param name="v">
-            /// Il vettore cui appartiene i
-            /// </param>
-            /// <param name="j">
-            /// Il peso del collegamento tra i e j
-            /// </param>
-            /// <returns></returns>
-            public static double RelativeAffinity(Matrix<double> res, int index, double aij)
-            {
-                return (aij - WeightedDegree(res, index));
-            }
+            if (v.ColumnCount == 1)
+                return 1;
 
-
-            public static double Weight(Matrix<double> v, int index)
+            Matrix<double> temp = v.RemoveColumn(index).RemoveRow(index);
+            double sum = 0;
+            for (int c = 0; c < temp.ColumnCount; c++)
             {
-                if (v.ColumnCount == 1)
-                    return 1;
-
-                Matrix<double> temp = v.RemoveColumn(index).RemoveRow(index);
-                double sum = 0;
-                for (int c = 0; c < temp.ColumnCount; c++)
-                {
-                    int tmp = c;
-                    if (c >= index)
-                        tmp = c + 1;
-                    sum = sum + (RelativeAffinity(temp, c, v[tmp, index]) * Weight(temp, c));
-                }
-                return sum;
+                int tmp = c;
+                if (c >= index)
+                    tmp = c + 1;
+                sum = sum + (RelativeAffinity(temp, c, v[tmp, index]) * Weight(temp, c));
             }
+            return sum;
+        }
 
-            public static double Weight2(Matrix<double> v, int index)
+        public static double Weight2(Matrix<double> v, int index)
+        {
+            if (v.ColumnCount == 1)
+                return 1;
+
+            double sum2 = 0;
+            Matrix<double> temp2 = v.RemoveColumn(index).RemoveRow(index);
+            for (int c = 0; c < temp2.ColumnCount; c++)
             {
-                if (v.ColumnCount == 1)
-                    return 1;
-
-                double sum2 = 0;
-                Matrix<double> temp2 = v.RemoveColumn(index).RemoveRow(index);
-                for (int c = 0; c < temp2.ColumnCount; c++)
-                {
-                    int tmp = c;
-                    if (c >= index)
-                        tmp = c + 1;
-                    int h = 0;
-                    while (h == index)
-                        h = h + 1;
-                    sum2 = sum2 + (v[tmp, index] - v[tmp, h]) * Weight(temp2, c);
-                }
-                return sum2;
+                int tmp = c;
+                if (c >= index)
+                    tmp = c + 1;
+                int h = 0;
+                while (h == index)
+                    h = h + 1;
+                sum2 = sum2 + (v[tmp, index] - v[tmp, h]) * Weight(temp2, c);
             }
+            return sum2;
         }
     }
 }
