@@ -10,39 +10,42 @@ namespace fFormations
 {
     class Proximity : Affinity
     {
-        public Proximity(Frame f) : base(f) {}
-        public Proximity() : base() { } //aggiunto costruttore vuoto
+        //public Proximity(Frame f) : base(f) {}
+        public Proximity(double scalarFactor) : base(scalarFactor) { } //aggiunto costruttore vuoto
         public override double HowToCompute(int i, int j)
         {
             return ComputationRegularAffinity(i, j);
         }
+
+        public double ComputationRegularAffinity(int i, int j)
+        {
+            return Math.Exp(-F.distances[i, j] / (2.0 * scalarFactor * scalarFactor));
+        }
     }
-    class ProxOrient : Affinity
+    class ProxOrient : Proximity
     {
         Vector vector1;
         Vector vector2;
+        Vector axisXVector;
         double angleij;
         double angleji;
-        double valij;
-        double valji;
+        double windowAngle;
 
-        public ProxOrient(Frame f) : base(f) {
+        /*public ProxOrient(Frame f) : base(f) {
              vector1 = new Vector();
              vector2 = new Vector();
              angleij = 0;
              angleji = 0;
-             valij = 0;
-             valji = 0;
-        }
+        }*/
 
         //costruttore vuoto
-        public ProxOrient() : base() {
+        public ProxOrient(double scalarFactor,double windowAngle) : base(scalarFactor) {
             vector1 = new Vector();
             vector2 = new Vector();
             angleij = 0;
             angleji = 0;
-            valij = 0;
-            valji = 0;
+            this.windowAngle = windowAngle;
+            axisXVector = new Vector(1, 0);
         }
 
         public void InitVectors(int i, int j) {
@@ -53,20 +56,46 @@ namespace fFormations
             vector2.Y = F.getPersonByHelpLabel(j).CoordY;
             //angolo fra i due vettori, dovrebbero essere uguali a meno di un segno forse.
             //angolo misurato in gradi quindi converto in radianti
-            angleij = Vector.AngleBetween(vector1, vector2) * Math.PI / 180.0;
-            angleji = Vector.AngleBetween(vector2, vector1) * Math.PI / 180.0;//dovrebbe cambiare solo il segno
+
+            Vector vij = vector2 - vector1;
+            Vector vji = vector1 - vector2;
+            angleij= Vector.AngleBetween(axisXVector, vij) * Math.PI / 180.0;
+            angleji= Vector.AngleBetween(axisXVector, vji) * Math.PI / 180.0;
+
+        }
+        /// <summary>
+        /// </summary>
+        /// <param name="anglei"> Angolo del vettore che identifica la persona i-esima o una sua posizione</param>
+        /// <param name="angleij"> Angolo del vettore tra la persona i-esima e j-esima rispetto all'asse x</param>
+        /// <param name="windowAngle"> Finestra di tolleranza fra il vettore ideale che congiunge le due persone, e dove realmente siano orientate </param>
+        /// <returns> Ritorna true se le due entità soddisfano le condizioni, false altrimenti</returns>
+        public bool ConditionRegularAffinity(double anglei, double angleij, double windowAngle)
+        {
+            if ((anglei >= 0 && angleij >= 0) || (anglei <= 0 && angleij <= 0))
+            {
+                double valij = Utils.AngleDifference(anglei, angleij);
+                return (valij <= windowAngle) && (valij >= -windowAngle);
+            }
+
+            if (angleij >= 0 && anglei <= 0)
+            {
+                return (Utils.changeSign(angleij + windowAngle) > anglei) || (angleij - windowAngle < anglei);
+            }
+
+            if (angleij <= 0 && anglei >= 0)
+            {
+                return (angleij + windowAngle > anglei) || (Utils.changeSign(angleij - windowAngle) < anglei);
+            }
+
+            throw new ArgumentException("Il metodo ha raggiunto una condizione irraggiungibile!!");
         }
 
         public override double HowToCompute(int i, int j) {
+            if (i == j)
+                return 1;
             InitVectors(i, j);
-            //In questo caso mi serve l'angolo della prima persona e quello della seconda
-            valij = GetMeasure(i) - angleij;
-            valji = GetMeasure(j) - angleji;
-            //Secondo me la ComputationRegularAffinity(i,j)=ComputationRegularAffinity(j,i)
-            //Se entrambe le condizioni sono verificate, devo calcolare il valore
-            //Se una delle due condizioni è falsa prendo 0, siccome la computazione
-            //coinvolge un'esponenziale allora 0 è sicuramente minore.
-            if (ConditionRegularAffinity(valij) || ConditionRegularAffinity(valji))
+
+            if (ConditionRegularAffinity(GetMeasure(i), angleij,windowAngle) && ConditionRegularAffinity(GetMeasure(j), angleji,windowAngle))
             {
                 return ComputationRegularAffinity(i, j);
             }
@@ -75,31 +104,19 @@ namespace fFormations
 
         public virtual double GetMeasure(int i)
         {
-            //Nel caso di Prox e Orien confronto l'angolo della persona con label i
             return F.getPersonByHelpLabel(i).Angle;
         }
+       
     }
 
     class SMEFO :ProxOrient
     {
-        public Vector<double> pf;//smefo values 
-        public Vector<double> centers;//centers of focus
         public Matrix<double> tempProxMatrix;
-        /*public SMEFO(Frame f): base(f)
-        {
-            pf = Vector<double>.Build.Dense(f.N); 
-            centers = Vector<double>.Build.Dense(f.N);
-            Affinity tempProximity = new Proximity(f);
-            tempProxMatrix = tempProximity.getCopyMatrix();
-        }*/
-
-        public SMEFO() : base(){}
+        public SMEFO(double scalarFactor,double windowAngle) : base(scalarFactor,windowAngle){}
 
         public override void InitOperation(Frame f)
         {
-            pf = Vector<double>.Build.Dense(f.N);
-            centers = Vector<double>.Build.Dense(f.N);
-            Affinity tempProximity = new Proximity(f);
+            Affinity tempProximity = new Proximity(scalarFactor);
             tempProximity.computeAffinity(f);
             tempProxMatrix = tempProximity.getCopyMatrix();
         }
@@ -115,7 +132,12 @@ namespace fFormations
         /// <param name="i"></param>
         /// <returns></returns>
         public double computeSMEFO(Person i) {
-            return Math.Acos(Vector.AngleBetween(new Vector(i.CoordX,i.CoordY),FocusCenters(i)) * Math.PI / 180.0);
+            Vector person = new Vector(i.CoordX, i.CoordY);
+            Vector focusCenter = FocusCenters(i);
+            Vector vectorPF = focusCenter - person;
+            double angle = Vector.AngleBetween(new Vector(1, 0), vectorPF) * Math.PI / 180.0;
+            return Math.Acos(angle);
+            //return Math.Acos(Vector.AngleBetween(new Vector(i.CoordX,i.CoordY),FocusCenters(i)) * Math.PI / 180.0);
         }
 
         /// <summary>

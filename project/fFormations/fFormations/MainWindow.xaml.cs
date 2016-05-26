@@ -44,7 +44,7 @@ namespace fFormations
             Debug.WriteLine("Frames correctly read");
             List<Group> groups = P.readGT(frames);
             Debug.WriteLine("GT correctly read"); */
-      
+
             /* MODULARITY CUT TEST 
 
             foreach(Frame f in frames)
@@ -60,15 +60,15 @@ namespace fFormations
                 Debug.WriteLine(g);
           //      Debug.WriteLine("Correct = " + res[0] + " fp = " + res[1] + " fn = " + res[2]);
             } */
-            
+
 
             /* DATA MANAGER */
 
-            DataManager dm = new DataManager(dataFile, gtFile);
+            //DataManager dm = new DataManager(dataFile, gtFile);
 
 
             /* ITERATION MANAGER TEST */
-
+            /*
             IterationManager im = new IterationManager(dm);
             Method MC = new ModularityCut();
           //  Affinity Aff = new Proximity();
@@ -81,28 +81,32 @@ namespace fFormations
 
             Console.ReadLine();
             
-            
+            */
 
-            
+
             ////////////////////////////////////////
             //////////////////Rocco////////////////
             ///////////////////////////////////////
-            /*
+
             string dataFile = @"input/features.txt";
             string gtFile = @"input/gt.txt";
             DataManager dm = new DataManager(dataFile, gtFile);
-            
+
             CollectorResult res = new CollectorResult();
+            Method m = new GlobalDominantSet(1E-1, 5E-2);
             foreach (Frame frame in dm.getAllFrames())
             {
-                Affinity a = new Proximity(frame);
+                //Affinity a = new SMEFO(frame);
+                Affinity a = new ProxOrient();
+                a.computeAffinity(frame);
                 //Method m = new ModularityCut();
-                Method m = new GlobalDominantSet(1E-2, 1E-7);
-                    //new LocalDominantSet(1E-3, 1E-4);
-                //GlobalDominantSet(1E-10);
+                //new AllSingleton(); 
+                //new GlobalDominantSet(1E-2, 1E-7);
+                //con 200 affinity ok
+                //new LocalDominantSet(1E-3, 1E-4);
                 m.Initialize(a);
                 Group my = m.ComputeGroup();
-                Result t = Group.Compare(my, dm.getGTById(frame.IdFrame),2.0/3.0);
+                Result t = Group.Compare(my, dm.getGTById(frame.IdFrame), 3.0 / 5.0);
                 res.addResult(t);
                 res.computeMeans();
                 Console.WriteLine(my);
@@ -113,8 +117,9 @@ namespace fFormations
 
                 Console.ReadLine();
             }
- 
-            
+            Console.Write(res.getSumPrec());
+
+            /*
             IterationManager im = new IterationManager(dm);
             //Method m = new ModularityCut();
             double deltaValue = 0.1;
