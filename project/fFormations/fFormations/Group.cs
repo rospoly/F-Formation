@@ -73,6 +73,7 @@ namespace fFormations
             int correct = 0;
             int falsePositive = 0;
             int falseNegative = 0;
+            int diffNumGroups = 0;
             foreach (List<Person> l2 in orig.Grouping.Values) //foreach gt group
             {
                 foreach (List<Person> l1 in val.Grouping.Values) //foreach detected group
@@ -92,11 +93,12 @@ namespace fFormations
             }
 
             falsePositive = val.Grouping.Values.Count - correct;
+            //falsePositive = val.Grouping.Values.Count - correct;
             //groups that are present in MY evaluation but not in TRUE one
             falseNegative = orig.Grouping.Values.Count - correct;
             //groups that are present in the TRUE evaluation but not in MY 
-
-            InfoRetrivial ir = new InfoRetrivial(correct, falsePositive, falseNegative);
+            diffNumGroups = val.Grouping.Values.Count - orig.Grouping.Values.Count;
+            InfoRetrivial ir = new InfoRetrivial(correct, falsePositive, falseNegative, diffNumGroups);
             return new Result(ir,val.IdFrame.IdFrame);
         }
 

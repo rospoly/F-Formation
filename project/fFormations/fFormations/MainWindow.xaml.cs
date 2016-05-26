@@ -97,7 +97,7 @@ namespace fFormations
             foreach (Frame frame in dm.getAllFrames())
             {
                 //Affinity a = new SMEFO(frame);
-                Affinity a = new ProxOrient();
+                Affinity a = new ProxOrient(15,Math.PI/2.0);
                 a.computeAffinity(frame);
                 //Method m = new ModularityCut();
                 //new AllSingleton(); 

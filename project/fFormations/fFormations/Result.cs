@@ -23,13 +23,14 @@ namespace fFormations
 {
     public struct InfoRetrivial
     {
-        public int correct, falsePositive, falseNegative;
+        public int correct, falsePositive, falseNegative, diffNumGroups;
         public double precision, recall, f1;
-        public InfoRetrivial(int correct,int falsePositive,int falseNegative)
+        public InfoRetrivial(int correct,int falsePositive,int falseNegative,int diffNumGroups)
         {
             this.correct = correct;
             this.falsePositive = falsePositive;
             this.falseNegative = falseNegative;
+            this.diffNumGroups = diffNumGroups;
 
             precision = (double)correct / (double)(correct + falsePositive); //precision = tp / (tp + fp)
             if (double.IsNaN(precision)) precision = 1;
