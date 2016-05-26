@@ -18,6 +18,11 @@ using System.Threading.Tasks;
     R = (numero di documenti pertinenti recuperati) / (numero di documenti pertinenti)=temp[0]/temp[0]+temp[2]
 
     F1 è la media armonica di P e R. E' un valore bilanciato che pesa in modo uguale sia P che R.
+
+    diffNumGroups mi dice se sto:
+        >0: sovrastimando i gruppi (troppi gruppi rispetto alla realtà);
+        <0: sottostimando i gruppi (meno rispetto alla realtà);
+            
 */
 namespace fFormations
 {
@@ -30,6 +35,7 @@ namespace fFormations
             this.correct = correct;
             this.falsePositive = falsePositive;
             this.falseNegative = falseNegative;
+
             this.diffNumGroups = diffNumGroups;
 
             precision = (double)correct / (double)(correct + falsePositive); //precision = tp / (tp + fp)
@@ -51,6 +57,7 @@ namespace fFormations
         public double correct { get; set; }
         public double falsePositive { get; set; }
         public double falseNegative { get; set; }
+        public int diffNumGroups { get; set; }
         int refIDFrame;
 
         public Result(InfoRetrivial ir, int IdFrame)
@@ -60,7 +67,7 @@ namespace fFormations
             correct = ir.correct;
             falsePositive = ir.falsePositive;
             falseNegative = ir.falseNegative;
-
+            diffNumGroups = ir.diffNumGroups;
             precision = ir.precision;
             recall = ir.recall;
             f1 = ir.f1;
@@ -69,7 +76,7 @@ namespace fFormations
 
         public override string ToString()
         {
-            return "Result: Id = " + refIDFrame + ", prec = " + precision + ", Rec = " + recall + ", f1 = " + f1 +"\n Correct = "+ correct+ ", FN = "+falseNegative+", FP = "+falsePositive;
+            return "Result: Id = " + refIDFrame + ", prec = " + precision + ", Rec = " + recall + ", f1 = " + f1 +"\n Correct = "+ correct+ ", FN = "+falseNegative+", FP = "+falsePositive+ ", diffNumGroups= "+diffNumGroups;
         }
     }
 
@@ -79,6 +86,10 @@ namespace fFormations
         public double precisionMean { get; set; }
         public double recallMean { get; set; }
         public double fMean { get; set; }
+        //Numero di gruppi in totale in eccesso rispetto alla realtà
+        public int timesOverEstimate{ get; set; }
+        //NUmero di gruppi in totale in difetto rispetto alla realtà
+        public int timesUnderEstimate { get; set; }
 
         public CollectorResult()
         {
@@ -104,10 +115,16 @@ namespace fFormations
             precisionMean = 0;
             recallMean = 0;
             fMean = 0;
+            timesOverEstimate = 0;
+            timesUnderEstimate = 0;
             if (l.Count != 0)
             {
                 foreach (Result r in l)
                 {
+                    if (r.diffNumGroups >= 0)
+                        timesOverEstimate = timesOverEstimate + r.diffNumGroups;
+                    else
+                        timesUnderEstimate = timesUnderEstimate + r.diffNumGroups;
                     precisionMean += r.precision;
                     recallMean += r.recall;
                     fMean += r.f1;
@@ -128,7 +145,7 @@ namespace fFormations
 
         public override string ToString()
         {
-            return "CollectorResult: precision = " + precisionMean + ", recall = " + recallMean + ", fmeasure = " + fMean;
+            return "CollectorResult: precision = " + precisionMean + ", recall = " + recallMean + ", fmeasure = " + fMean + ", timesOverEst = " + timesOverEstimate + ", timesUnderEst = " + timesUnderEstimate;
         }
     }
 }

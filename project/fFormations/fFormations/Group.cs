@@ -97,7 +97,10 @@ namespace fFormations
             //groups that are present in MY evaluation but not in TRUE one
             falseNegative = orig.Grouping.Values.Count - correct;
             //groups that are present in the TRUE evaluation but not in MY 
-            diffNumGroups = val.Grouping.Values.Count - orig.Grouping.Values.Count;
+            if (val.Grouping.Values.Count == 0)
+                diffNumGroups = 0;
+            else
+                diffNumGroups = val.Grouping.Values.Count - orig.Grouping.Values.Count;
             InfoRetrivial ir = new InfoRetrivial(correct, falsePositive, falseNegative, diffNumGroups);
             return new Result(ir,val.IdFrame.IdFrame);
         }

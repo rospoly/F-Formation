@@ -51,7 +51,7 @@ namespace fFormations
         {
             ResetVector();
             Group g = new Group(a.F);
-            Utils.printMatrix(matrix);
+            //Utils.printMatrix(matrix);
             while (indexes.Count > 1)
             {
                 while (RecursiveResearchMax() > DeltaValue) {};
@@ -60,12 +60,13 @@ namespace fFormations
                     List<int> label = FindDominantGroup();
                     List<int> ids = FromLabelToId(label);
 
-                    Utils.printMatrix(vector);
-                    Utils.printMatrix(matrix);
+                    //Utils.printMatrix(vector);
+                    //Utils.printMatrix(matrix);
                     
                     if (StoppingCriterium(ids))
                     {
                         indexes.Clear();
+                        g=new Group(a.F);
                     }
                     else
                     {

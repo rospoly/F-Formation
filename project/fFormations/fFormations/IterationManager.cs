@@ -18,7 +18,6 @@ namespace fFormations
         }
 
         /// <summary>
-        /// Non Implementato da sistemare
         /// </summary>
         /// <param name="m"></param>
         /// <param name="a"></param>
@@ -49,11 +48,16 @@ namespace fFormations
             //Console.WriteLine("GroupList computed has size: " + computed.Count);
             CollectorResult rs = new CollectorResult();
             foreach (Group g in computed) {
-                rs.addResult(Group.Compare(g,DM.getGTById(g.IdFrame.IdFrame),2.0/3.0));
+                rs.addResult(Group.Compare(g,DM.getGTById(g.IdFrame.IdFrame),3.0/5.0));
             }
-
             rs.computeMeans(); //computes mean of all results
             return rs;
+        }
+
+        public void printAllResult()
+        {
+            CollectorResult rs = comparison();
+            Console.WriteLine(rs.getAllResultsStrings());
         }
 
         //returns a string which specifies the method and the type of affinity used in this iteration manager

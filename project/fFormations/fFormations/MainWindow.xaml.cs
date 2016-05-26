@@ -88,16 +88,17 @@ namespace fFormations
             //////////////////Rocco////////////////
             ///////////////////////////////////////
 
+            /*
             string dataFile = @"input/features.txt";
             string gtFile = @"input/gt.txt";
             DataManager dm = new DataManager(dataFile, gtFile);
 
             CollectorResult res = new CollectorResult();
-            Method m = new GlobalDominantSet(1E-1, 5E-2);
+            Method m = new GlobalDominantSet(1E-1, 1E-2);
             foreach (Frame frame in dm.getAllFrames())
             {
-                //Affinity a = new SMEFO(frame);
-                Affinity a = new ProxOrient(15,Math.PI/2.0);
+                Affinity a = new SMEFO(15, Math.PI / 2.0);
+                //Affinity a = new ProxOrient(15,Math.PI/2.0);
                 a.computeAffinity(frame);
                 //Method m = new ModularityCut();
                 //new AllSingleton(); 
@@ -115,22 +116,63 @@ namespace fFormations
                 Console.WriteLine(t);
                 Console.WriteLine(res);
 
-                Console.ReadLine();
+                //Console.ReadLine();
             }
             Console.Write(res.getSumPrec());
+            */
 
-            /*
+            DataManager dm = new DataManager(dataFile, gtFile);
             IterationManager im = new IterationManager(dm);
-            //Method m = new ModularityCut();
-            double deltaValue = 0.1;
-            double deltaZero = 0.1;
+            int scalarDistance = 15;
+            double windowSize = Math.PI / 2.0;
+            double deltaValue = 0;
+            double deltaZero = 0;
+            Affinity a;
+            Method m;
+            double fMeasure = 0;
+            for (int i = 1; i <= 5; i++)
+            {
+                for (int j = 1; j <= 5; j++)
+                {
+                    for (int val = 1; val <= 5; val = val + 4)
+                    {
+                        deltaValue = val * Math.Pow(10, -i);
+                        deltaZero = val * Math.Pow(10, -j);
+                        for (int scalar = 10; scalar <= 200; scalar = scalar + 10)
+                        {
+                            scalarDistance = scalar;
+                            for (int pi = 0; pi <= 3; pi++)
+                            {
+                                windowSize = Math.PI / (2.0 + pi);
+                                a = new ProxOrient(scalarDistance, windowSize);
+                                m = new LocalDominantSet(deltaZero, deltaValue);
+                                im.computeMethod(m, a);
+                                CollectorResult cr = im.comparison();
+                                cr.computeMeans();
+                                if (cr.fMean > fMeasure)
+                                {
+                                    Console.WriteLine();
+                                    Console.WriteLine("deltaZero=" + deltaZero + ", deltaValue=" + deltaValue + ", scalarDistance=" + scalarDistance + ", windowSize=" + windowSize);
+                                    Console.WriteLine(cr);
+                                    Console.WriteLine();
+                                    fMeasure = cr.fMean;
+                                }
+                                else
+                                    Console.Write("*");
+                            }
+                        }
+                        //}
+                    }
+                }
+            }
+            Console.WriteLine("FINITO");
+            /*
             for (int i = 1; i < 10; i++)
             {
                for (int j=1;j<10;j++)
                 {
                    // Method m = new LocalDominantSet(1E-2, 1E-7);
                     Method m = new GlobalDominantSet(deltaZero, deltaValue);
-                    Affinity Aff = new Proximity();
                     im.computeMethod(m, Aff);
                     CollectorResult res = im.comparison();
                     Console.WriteLine(res);

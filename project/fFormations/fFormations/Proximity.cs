@@ -31,13 +31,6 @@ namespace fFormations
         double angleji;
         double windowAngle;
 
-        /*public ProxOrient(Frame f) : base(f) {
-             vector1 = new Vector();
-             vector2 = new Vector();
-             angleij = 0;
-             angleji = 0;
-        }*/
-
         //costruttore vuoto
         public ProxOrient(double scalarFactor,double windowAngle) : base(scalarFactor) {
             vector1 = new Vector();
@@ -136,7 +129,8 @@ namespace fFormations
             Vector focusCenter = FocusCenters(i);
             Vector vectorPF = focusCenter - person;
             double angle = Vector.AngleBetween(new Vector(1, 0), vectorPF) * Math.PI / 180.0;
-            return Math.Acos(angle);
+            return angle;
+            //return Math.Acos(angle);
             //return Math.Acos(Vector.AngleBetween(new Vector(i.CoordX,i.CoordY),FocusCenters(i)) * Math.PI / 180.0);
         }
 
