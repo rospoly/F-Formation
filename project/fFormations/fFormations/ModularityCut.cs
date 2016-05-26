@@ -18,12 +18,14 @@ namespace fFormations
         private bool KLflag = false;
         private Matrix<double> B; //modularity matrix for entire network
         private Matrix<double> A; //affinity matrix
+        private double epsilon; //threshold to stop recursive division
 
         private Split firstSplit;
 
-        public ModularityCut(bool KL=false)
+        public ModularityCut(double epsilon, bool KL=false)
         {
             KLflag = KL; //if true, we apply kernighan-lin refinement
+            this.epsilon = epsilon;
         }
 
         public void Initialize(Affinity a)
@@ -213,7 +215,7 @@ namespace fFormations
 
                 double deltaQ = (S.Transpose() * Bg * S).Trace() / (2 * modCut.m);
                 //Debug.WriteLine("DeltaQ = " + deltaQ);
-                if (deltaQ > 1E-3) return true; //modularity decreases, we can split
+                if (deltaQ < modCut.epsilon) return true; //modularity decreases, we can split
                 else return false;
 
                 //double Q = (1 / (4 * modCut.m)) * (partitionVector.Transpose() * Bg * partitionVector)[0, 0];
