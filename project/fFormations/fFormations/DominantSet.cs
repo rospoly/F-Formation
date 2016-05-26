@@ -70,8 +70,13 @@ namespace fFormations
                     }
                     else
                     {
-                        g.addSubGroup(ids);
-                        RemoveDominantGroup(label, ids);
+                        if (ids.Count > 0)
+                        {
+                            g.addSubGroup(ids);
+                            RemoveDominantGroup(label, ids);
+                        }
+                        else
+                            return new Group(a.F);
                     }
                 }
             }

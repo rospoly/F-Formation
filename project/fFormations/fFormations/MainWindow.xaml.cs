@@ -125,11 +125,12 @@ namespace fFormations
             IterationManager im = new IterationManager(dm);
             int scalarDistance = 15;
             double windowSize = Math.PI / 2.0;
-            double deltaValue = 0;
-            double deltaZero = 0;
+            double deltaValue = 0.1;
+            double deltaZero = 0.1;
             Affinity a;
             Method m;
             double fMeasure = 0;
+            
             for (int i = 1; i <= 5; i++)
             {
                 for (int j = 1; j <= 5; j++)
@@ -152,10 +153,12 @@ namespace fFormations
                                 if (cr.fMean > fMeasure)
                                 {
                                     Console.WriteLine();
-                                    Console.WriteLine("deltaZero=" + deltaZero + ", deltaValue=" + deltaValue + ", scalarDistance=" + scalarDistance + ", windowSize=" + windowSize);
+                                    String s = "deltaZero=" + deltaZero + ", deltaValue=" + deltaValue + ", scalarDistance=" + scalarDistance + ", windowSize=" + windowSize;
+                                    Console.WriteLine(s);
                                     Console.WriteLine(cr);
                                     Console.WriteLine();
                                     fMeasure = cr.fMean;
+                                    System.IO.File.AppendAllText(@"C:\Users\Roky\Desktop\fileTExt", s+"\n"+cr);
                                 }
                                 else
                                     Console.Write("*");
