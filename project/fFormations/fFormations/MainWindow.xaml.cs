@@ -123,14 +123,13 @@ namespace fFormations
 
             DataManager dm = new DataManager(dataFile, gtFile);
             IterationManager im = new IterationManager(dm);
-            int scalarDistance = 15;
-            double windowSize = Math.PI / 2.0;
-            double deltaValue = 0.1;
-            double deltaZero = 0.1;
+            int scalarDistance = 0;
+            double windowSize = 0;
+            double deltaValue = 0;
+            double deltaZero = 0;
             Affinity a;
             Method m;
             double fMeasure = 0;
-            
             for (int i = 1; i <= 5; i++)
             {
                 for (int j = 1; j <= 5; j++)
@@ -145,10 +144,10 @@ namespace fFormations
                             for (int pi = 0; pi <= 3; pi++)
                             {
                                 windowSize = Math.PI / (2.0 + pi);
-                                a = new ProxOrient(scalarDistance, windowSize);
+                                a = new SMEFO(scalarDistance,windowSize);
                                 m = new LocalDominantSet(deltaZero, deltaValue);
                                 im.computeMethod(m, a);
-                                CollectorResult cr = im.comparison();
+                                CollectorResult cr = im.comparison(true);
                                 cr.computeMeans();
                                 if (cr.fMean > fMeasure)
                                 {
@@ -158,13 +157,12 @@ namespace fFormations
                                     Console.WriteLine(cr);
                                     Console.WriteLine();
                                     fMeasure = cr.fMean;
-                                    System.IO.File.AppendAllText(@"C:\Users\Roky\Desktop\fileTExt", s+"\n"+cr);
+                                    System.IO.File.AppendAllText(@"output\SMEFO-DS-LC.txt", s + Environment.NewLine + cr + Environment.NewLine);
                                 }
                                 else
                                     Console.Write("*");
                             }
                         }
-                        //}
                     }
                 }
             }

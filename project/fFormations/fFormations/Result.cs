@@ -28,15 +28,15 @@ namespace fFormations
 {
     public struct InfoRetrivial
     {
-        public int correct, falsePositive, falseNegative, diffNumGroups;
+        public int correct, falsePositive, falseNegative;//, diffNumGroups;
         public double precision, recall, f1;
-        public InfoRetrivial(int correct,int falsePositive,int falseNegative,int diffNumGroups)
+        public InfoRetrivial(int correct,int falsePositive,int falseNegative)//,int diffNumGroups)
         {
             this.correct = correct;
             this.falsePositive = falsePositive;
             this.falseNegative = falseNegative;
 
-            this.diffNumGroups = diffNumGroups;
+            //this.diffNumGroups = diffNumGroups;
 
             precision = (double)correct / (double)(correct + falsePositive); //precision = tp / (tp + fp)
             if (double.IsNaN(precision)) precision = 1;
@@ -58,25 +58,26 @@ namespace fFormations
         public double falsePositive { get; set; }
         public double falseNegative { get; set; }
         public int diffNumGroups { get; set; }
+        public bool valid { get; set; }
         int refIDFrame;
 
-        public Result(InfoRetrivial ir, int IdFrame)
+        public Result(InfoRetrivial ir, int IdFrame, bool valid)
         {
             refIDFrame = IdFrame;
 
             correct = ir.correct;
             falsePositive = ir.falsePositive;
             falseNegative = ir.falseNegative;
-            diffNumGroups = ir.diffNumGroups;
             precision = ir.precision;
             recall = ir.recall;
             f1 = ir.f1;
+            this.valid = valid;
 
         }
 
         public override string ToString()
         {
-            return "Result: Id = " + refIDFrame + ", prec = " + precision + ", Rec = " + recall + ", f1 = " + f1 +"\n Correct = "+ correct+ ", FN = "+falseNegative+", FP = "+falsePositive+ ", diffNumGroups= "+diffNumGroups;
+            return "Result: Id = " + refIDFrame + ", prec = " + precision + ", Rec = " + recall + ", f1 = " + f1 + "\n Correct = " + correct + ", FN = " + falseNegative + ", FP = " + falsePositive;// + ", diffNumGroups= "+diffNumGroups;
         }
     }
 
@@ -119,6 +120,7 @@ namespace fFormations
             timesUnderEstimate = 0;
             if (l.Count != 0)
             {
+                /*
                 foreach (Result r in l)
                 {
                     if (r.diffNumGroups >= 0)
@@ -128,10 +130,18 @@ namespace fFormations
                     precisionMean += r.precision;
                     recallMean += r.recall;
                     fMean += r.f1;
+                }*/
+                int countValid = 0;
+                for (int i = 0; i < l.Count && l[i].valid; i++)
+                {
+                    precisionMean += l[i].precision;
+                    recallMean += l[i].recall;
+                    fMean += l[i].f1;
+                    countValid++;
                 }
-                precisionMean /= l.Count;
-                recallMean /= l.Count;
-                fMean /= l.Count;
+                precisionMean /= countValid;
+                recallMean /= countValid;
+                fMean /= countValid;
             }
         }
 
@@ -145,7 +155,7 @@ namespace fFormations
 
         public override string ToString()
         {
-            return "CollectorResult: precision = " + precisionMean + ", recall = " + recallMean + ", fmeasure = " + fMean + ", timesOverEst = " + timesOverEstimate + ", timesUnderEst = " + timesUnderEstimate;
+            return "CollectorResult: precision = " + precisionMean + ", recall = " + recallMean + ", fmeasure = " + fMean;// + ", timesOverEst = " + timesOverEstimate + ", timesUnderEst = " + timesUnderEstimate;
         }
     }
 }

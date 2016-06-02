@@ -87,7 +87,6 @@ namespace fFormations
             if (i == j)
                 return 1;
             InitVectors(i, j);
-
             if (ConditionRegularAffinity(GetMeasure(i), angleij,windowAngle) && ConditionRegularAffinity(GetMeasure(j), angleji,windowAngle))
             {
                 return ComputationRegularAffinity(i, j);
