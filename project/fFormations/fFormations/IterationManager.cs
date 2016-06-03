@@ -44,11 +44,11 @@ namespace fFormations
             }
         }*/
 
-        public CollectorResult comparison(bool considerDiscarded) {
+        public CollectorResult comparison(bool considerDiscarded,double measurementError) {
             //Console.WriteLine("GroupList computed has size: " + computed.Count);
             CollectorResult rs = new CollectorResult();
             foreach (Group g in computed) {
-                rs.addResult(Group.Compare(g,DM.getGTById(g.IdFrame.IdFrame),3.0/5.0,considerDiscarded));
+                rs.addResult(Group.Compare(g,DM.getGTById(g.IdFrame.IdFrame),measurementError,considerDiscarded));
             }
             rs.computeMeans(); //computes mean of all results
             return rs;

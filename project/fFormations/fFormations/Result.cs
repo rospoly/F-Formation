@@ -111,7 +111,7 @@ namespace fFormations
             return p;
         }
 
-        public void computeMeans()
+        public String computeMeans()
         {
             precisionMean = 0;
             recallMean = 0;
@@ -132,17 +132,21 @@ namespace fFormations
                     fMean += r.f1;
                 }*/
                 int countValid = 0;
-                for (int i = 0; i < l.Count && l[i].valid; i++)
-                {
-                    precisionMean += l[i].precision;
-                    recallMean += l[i].recall;
-                    fMean += l[i].f1;
-                    countValid++;
+                foreach (Result item in l) {
+                    if (item.valid)
+                    {
+                        precisionMean += item.precision;
+                        recallMean += item.recall;
+                        fMean += item.f1;
+                        countValid++;
+                    }
                 }
                 precisionMean /= countValid;
                 recallMean /= countValid;
                 fMean /= countValid;
+                return countValid+"/"+l.Count;
             }
+            return "Empty List!!!";
         }
 
         public string getAllResultsStrings()

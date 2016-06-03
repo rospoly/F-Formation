@@ -33,81 +33,87 @@ namespace fFormations
         public MainWindow()
         {
             InitializeComponent();
-
-            /* PARSER TEST  
-
-            //get singleton and set paths
-            Parser P = Parser.getParser();
-            P.setDataFile(dataFile);
-            P.setGTFile(gtFile);
-            List<Frame> frames = P.readData();
-            Debug.WriteLine("Frames correctly read");
-            List<Group> groups = P.readGT(frames);
-            Debug.WriteLine("GT correctly read"); */
-
-            /* MODULARITY CUT TEST 
-
-            foreach(Frame f in frames)
-            {
-                Affinity aff = new Proximity(f);
-                //     Affinity aff = new ProxOrient(f);
-                ModularityCut mc = new ModularityCut();
-                mc.Initialize(aff);
-                Group g = mc.ComputeGroup();
-        //        List<int> res = Group.Compare(g, groups[f.IdFrame-1]);
-                
-                Debug.Write("Frame " + f.IdFrame + ": ");
-                Debug.WriteLine(g);
-          //      Debug.WriteLine("Correct = " + res[0] + " fp = " + res[1] + " fn = " + res[2]);
-            } */
-
-
-            /* DATA MANAGER */
-
-            //DataManager dm = new DataManager(dataFile, gtFile);
-
-
-            /* ITERATION MANAGER TEST */
-            /*
-            IterationManager im = new IterationManager(dm);
-            Method MC = new ModularityCut();
-          //  Affinity Aff = new Proximity();
-            Affinity Aff = new ProxOrient();
-            im.computeMethod(MC, Aff);
-            CollectorResult res = im.comparison();
-
-            Console.WriteLine(im.getComputationType());
-            Console.WriteLine(res);
-
-            Console.ReadLine();
-            
-            */
-
-
-            ////////////////////////////////////////
-            //////////////////Rocco////////////////
-            ///////////////////////////////////////
-
-            /*
-            string dataFile = @"input/features.txt";
-            string gtFile = @"input/gt.txt";
             DataManager dm = new DataManager(dataFile, gtFile);
+            
+            IterationManager im = new IterationManager(dm);
 
-            CollectorResult res = new CollectorResult();
-            Method m = new GlobalDominantSet(1E-1, 1E-2);
+            int scalarDistance = 200;
+            double windowSize = 0;
+            double deltaValue = 0.01;
+            double deltaZero = 0.01;
+
+            Affinity aff;
+            Method m;
+
+            String path = @"output\TestPerGrafico\Angle\SMEFO-Modularity-Angle.txt";
+            String s = "deltaZero=" + deltaZero + ", deltaValue=" + deltaValue + "Sigma="+scalarDistance;
+            String graph = "";
+            Console.WriteLine(s);
+            System.IO.File.AppendAllText(path, s + Environment.NewLine);
+            //epsilon 1E-5, -6
+            for (int pi = 0; pi <= 10; pi++)
+            {
+                windowSize = Math.PI / (2.0 + pi);
+                aff = new SMEFO(scalarDistance, windowSize);
+                m = new ModularityCut(1E-2);
+                im.computeMethod(m, aff);
+                CollectorResult cr = im.comparison(true, 2.0/3.0);
+                String str=cr.computeMeans();
+                Console.WriteLine();
+                Console.WriteLine("Window Size: " + windowSize+" "+ cr + " "+str);
+                Console.WriteLine();
+                System.IO.File.AppendAllText(path, "Window Size: " + windowSize + " " + cr + " N° Risposte: "+str+ Environment.NewLine);
+                graph = graph + Environment.NewLine + windowSize + " " + cr.fMean;
+            }
+            System.IO.File.AppendAllText(path, graph);
+
+            /*
+
+            int scalarDistance = 10;
+            double windowSize = 0;
+            double deltaValue = 0.01;
+            double deltaZero = 0.0001;
+
+            Affinity aff;
+            Method m;
+            
+            String path = @"output\TestPerGrafico\SMEFO-DS-LC-Sigma.txt";
+            String s = "deltaZero=" + deltaZero + ", deltaValue=" + deltaValue + ", angle=PI/2";
+            String graph = "";
+            Console.WriteLine(s);
+            System.IO.File.AppendAllText(path, s + Environment.NewLine);
+
+            for (int var = 1; var <= 30; var=var+1)
+            {
+                scalarDistance = var;
+                windowSize = Math.PI /2.0 ;
+                aff = new SMEFO(scalarDistance, windowSize);
+                m = new LocalDominantSet(deltaZero, deltaValue);
+                im.computeMethod(m, aff);
+                CollectorResult cr = im.comparison(true, 2.0 / 3.0);
+                String str = cr.computeMeans();
+                Console.WriteLine();
+                Console.WriteLine("Scalar Distance: " + scalarDistance + " " + cr + " " + str);
+                Console.WriteLine();
+                System.IO.File.AppendAllText(path, "Scalar Distance" + scalarDistance + " " + cr + " N° Risposte: " + str + Environment.NewLine);
+                graph = graph + Environment.NewLine + scalarDistance + " " + cr.fMean;
+            }
+            System.IO.File.AppendAllText(path,graph);
+
+            /*
             foreach (Frame frame in dm.getAllFrames())
             {
-                Affinity a = new SMEFO(15, Math.PI / 2.0);
+                aff = new SMEFO(scalarDistance, windowSize);
                 //Affinity a = new ProxOrient(15,Math.PI/2.0);
-                a.computeAffinity(frame);
+                aff.computeAffinity(frame);
                 //Method m = new ModularityCut();
                 //new AllSingleton(); 
                 //new GlobalDominantSet(1E-2, 1E-7);
                 //con 200 affinity ok
                 //new LocalDominantSet(1E-3, 1E-4);
-                m.Initialize(a);
+                m.Initialize(aff);
                 Group my = m.ComputeGroup();
-                Result t = Group.Compare(my, dm.getGTById(frame.IdFrame), 3.0 / 5.0);
+                Result t = Group.Compare(my, dm.getGTById(frame.IdFrame),0.66);
                 res.addResult(t);
                 res.computeMeans();
                 Console.WriteLine(my);
@@ -116,20 +122,12 @@ namespace fFormations
                 Console.WriteLine(t);
                 Console.WriteLine(res);
 
-                //Console.ReadLine();
+                Console.ReadLine();
             }
-            Console.Write(res.getSumPrec());
-            */
+            
+            
 
-            DataManager dm = new DataManager(dataFile, gtFile);
-            IterationManager im = new IterationManager(dm);
-            int scalarDistance = 0;
-            double windowSize = 0;
-            double deltaValue = 0;
-            double deltaZero = 0;
-            Affinity a;
-            Method m;
-            double fMeasure = 0;
+            /*
             for (int i = 1; i <= 5; i++)
             {
                 for (int j = 1; j <= 5; j++)
@@ -167,23 +165,11 @@ namespace fFormations
                 }
             }
             Console.WriteLine("FINITO");
-            /*
-            for (int i = 1; i < 10; i++)
-            {
-               for (int j=1;j<10;j++)
-                {
-                   // Method m = new LocalDominantSet(1E-2, 1E-7);
-                    Method m = new GlobalDominantSet(deltaZero, deltaValue);
-                    im.computeMethod(m, Aff);
-                    CollectorResult res = im.comparison();
-                    Console.WriteLine(res);
-                    Console.WriteLine("i:"+i+", j:"+j);
+            */
 
-                    //Console.ReadLine();
-                    deltaZero = Math.Pow(10, -j);
-               }
-               deltaValue = Math.Pow(10, -i);
-            } */
+            /*
+            
+            */
         }
     }
 }
