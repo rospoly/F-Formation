@@ -64,24 +64,51 @@ namespace fFormations
 
             /* DATA MANAGER */
 
-            //DataManager dm = new DataManager(dataFile, gtFile);
+            DataManager dm = new DataManager(dataFile, gtFile);
 
 
             /* ITERATION MANAGER TEST */
-            /*
-            IterationManager im = new IterationManager(dm);
-            Method MC = new ModularityCut();
-          //  Affinity Aff = new Proximity();
-            Affinity Aff = new ProxOrient();
-            im.computeMethod(MC, Aff);
-            CollectorResult res = im.comparison();
+            CollectorResult res = new CollectorResult();
+            List<string> val = new List<string>();
 
-            Console.WriteLine(im.getComputationType());
-            Console.WriteLine(res);
+            //for (double e = 1E-6; e < 1E-3; e = e + 2E-6)
+            //{
+            //    IterationManager im = new IterationManager(dm);
+            //    Method MC = new ModularityCut(e, true);
+            //    Affinity Aff = new SMEFO(200, Math.PI/2);
+            //    //  Affinity Aff = new ProxOrient();
+            //    im.computeMethod(MC, Aff);
 
-            Console.ReadLine();
-            
-            */
+            //    res = im.comparison();
+            //    Console.WriteLine(e);
+            //    Console.WriteLine(im.getComputationType());
+            //    Console.WriteLine(res);
+
+            //    val.Add(e + " " + res.precisionMean + " " + res.recallMean + " " + res.fMean);
+            //   // Console.ReadLine();
+            //}
+
+            //string[] values = val.ToArray();
+            //System.IO.File.WriteAllLines(@"output/modcut_smefo_epsilonTest.txt", values);
+
+            for (double i = 1; i < 31; i = i +1)
+            {
+                IterationManager im = new IterationManager(dm);
+                Method MC = new ModularityCut(1E-5, true);
+                Affinity Aff = new SMEFO(i, Math.PI/2);
+                //  Affinity Aff = new ProxOrient();
+                im.computeMethod(MC, Aff);
+
+                res = im.comparison();
+                Console.WriteLine(im.getComputationType());
+                Console.WriteLine(res);
+
+                val.Add(i + " " + res.precisionMean + " " + res.recallMean + " " + res.fMean);
+                // Console.ReadLine();
+            }
+
+            string[] values = val.ToArray();
+            System.IO.File.WriteAllLines(@"output/SMEFO-MC-Sigma.txt", values);
 
 
             ////////////////////////////////////////
@@ -120,7 +147,7 @@ namespace fFormations
             }
             Console.Write(res.getSumPrec());
             */
-
+            /*
             DataManager dm = new DataManager(dataFile, gtFile);
             IterationManager im = new IterationManager(dm);
             int scalarDistance = 15;
