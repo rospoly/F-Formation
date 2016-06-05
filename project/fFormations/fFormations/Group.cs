@@ -67,13 +67,13 @@ namespace fFormations
         /// <param name="orig"></param>
         /// <param name="error"></param>
         /// <returns></returns>
-        public static Result Compare(Group val, Group orig,double error=1) {
+        public static Result Compare(Group val, Group orig,double error=1,bool considerDiscarded=true) {
             if (val.IdFrame != orig.IdFrame)
                 throw new Exception("Attenzione!!! stiamo confrontando gruppi diversi");
+           
             int correct = 0;
             int falsePositive = 0;
             int falseNegative = 0;
-            int diffNumGroups = 0;
             foreach (List<Person> l2 in orig.Grouping.Values) //foreach gt group
             {
                 foreach (List<Person> l1 in val.Grouping.Values) //foreach detected group
@@ -97,12 +97,11 @@ namespace fFormations
             //groups that are present in MY evaluation but not in TRUE one
             falseNegative = orig.Grouping.Values.Count - correct;
             //groups that are present in the TRUE evaluation but not in MY 
-            if (val.Grouping.Values.Count == 0)
-                diffNumGroups = 0;
-            else
-                diffNumGroups = val.Grouping.Values.Count - orig.Grouping.Values.Count;
-            InfoRetrivial ir = new InfoRetrivial(correct, falsePositive, falseNegative, diffNumGroups);
-            return new Result(ir,val.IdFrame.IdFrame);
+            InfoRetrivial ir = new InfoRetrivial(correct, falsePositive, falseNegative);//, diffNumGroups);
+            bool tmp = true;
+            if (val.Grouping.Values.Count == 0 && !considerDiscarded)
+                tmp = false;
+            return new Result(ir,val.IdFrame.IdFrame,tmp);
         }
 
         public override string ToString()

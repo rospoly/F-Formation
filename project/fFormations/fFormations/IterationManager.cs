@@ -44,21 +44,21 @@ namespace fFormations
             }
         }*/
 
-        public CollectorResult comparison() {
+        public CollectorResult comparison(bool considerDiscarded,double measurementError) {
             //Console.WriteLine("GroupList computed has size: " + computed.Count);
             CollectorResult rs = new CollectorResult();
             foreach (Group g in computed) {
-                rs.addResult(Group.Compare(g,DM.getGTById(g.IdFrame.IdFrame),3.0/5.0));
+                rs.addResult(Group.Compare(g,DM.getGTById(g.IdFrame.IdFrame),measurementError,considerDiscarded));
             }
             rs.computeMeans(); //computes mean of all results
             return rs;
         }
 
-        public void printAllResult()
+        /*public void printAllResult()
         {
-            CollectorResult rs = comparison();
+            //CollectorResult rs = comparison();
             Console.WriteLine(rs.getAllResultsStrings());
-        }
+        }*/
 
         //returns a string which specifies the method and the type of affinity used in this iteration manager
         public string getComputationType()

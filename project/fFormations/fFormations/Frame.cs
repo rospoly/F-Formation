@@ -10,7 +10,6 @@ namespace fFormations
 {
     public class Frame
     {
-
         public List<Person> Persons { get; private set; }
         public Matrix<double> distances { get; private set; }
         protected List<int> Indexes { get; set; }
